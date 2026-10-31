@@ -1,0 +1,1685 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px system-ui, -apple-system, "Segoe UI", sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>مكتب التوظيف الذكي</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@500;600;700&display=swap">
+<style>
+/* Layout: RTL workbench — intake form + live fuzzy readout on the right, ranked shortlist on the left */
+:root {
+  --bg: #F1F4F7; --surface: #FFFFFF; --ink: #16202B; --muted: #5A6777; --line: #D8DEE6;
+  --accent: #1F4E78; --accent-soft: #E2EBF4; --on-accent: #FFFFFF;
+  --hire: #1C7543; --hire-bg: #DCF1E3; --short: #8A5B00; --short-bg: #FBEFC9; --rej: #AE2A22; --rej-bg: #FAE0DD;
+  --font-display: "Readex Pro", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --font-body: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0E141B; --surface: #161F29; --ink: #E5EBF1; --muted: #98A6B6; --line: #283441;
+  --accent: #82B2DF; --accent-soft: #1B2B3C; --on-accent: #0E141B;
+  --hire: #71D49B; --hire-bg: #16301F; --short: #E7C25C; --short-bg: #32290F; --rej: #F1968E; --rej-bg: #3A1D1B; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0E141B; --surface: #161F29; --ink: #E5EBF1; --muted: #98A6B6; --line: #283441;
+  --accent: #82B2DF; --accent-soft: #1B2B3C; --on-accent: #0E141B;
+  --hire: #71D49B; --hire-bg: #16301F; --short: #E7C25C; --short-bg: #32290F; --rej: #F1968E; --rej-bg: #3A1D1B; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+.app { max-width: 1280px; margin: 0 auto; padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 18px; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+h1 { font-size: 1.55rem; }
+h2 { font-size: 1.08rem; }
+.muted { color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* header */
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px; }
+.brand p { margin: 2px 0 0; color: var(--muted); font-size: .9rem; }
+.jobbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.jobbar label { font-size: .8rem; color: var(--muted); }
+
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 14px; cursor: pointer; font-weight: 500; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.danger { color: var(--rej); }
+.btn.ghost { background: transparent; border-color: transparent; padding: 4px 8px; }
+.btn.ghost:hover { border-color: var(--line); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+select, input[type=text], input[type=number], input[type=password], input[type=url], textarea {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; width: 100%; box-sizing: border-box; }
+textarea { resize: vertical; min-height: 54px; }
+
+.banner { border: 1px dashed var(--line); border-radius: var(--r); padding: 10px 14px; color: var(--muted); font-size: .9rem; }
+
+/* settings */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+details.panel > summary { cursor: pointer; padding: 12px 16px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+details.panel > summary::-webkit-details-marker { display: none; }
+details.panel > summary .muted { font-weight: 400; font-size: .88rem; }
+.settings { padding: 4px 16px 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field > span { font-size: .82rem; color: var(--muted); }
+.field small { color: var(--muted); font-size: .76rem; }
+
+/* summary strip */
+.stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 14px; }
+.stat b { display: block; font-family: var(--font-display); font-size: 1.5rem; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.stat span { font-size: .8rem; color: var(--muted); }
+.stat.hire b { color: var(--hire); } .stat.short b { color: var(--short); } .stat.rej b { color: var(--rej); }
+
+/* main grid */
+.main { display: grid; grid-template-columns: minmax(320px, 400px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.slider { display: flex; flex-direction: column; gap: 2px; }
+.slider .lab { display: flex; justify-content: space-between; font-size: .82rem; color: var(--muted); }
+.slider .lab output { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* live readout */
+.readout { border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.scoreline { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.big { font-family: var(--font-display); font-size: 2.3rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+.big small { font-size: 1rem; color: var(--muted); font-weight: 500; }
+.pill { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: .8rem; font-weight: 600; white-space: nowrap; }
+.pill.hire { background: var(--hire-bg); color: var(--hire); }
+.pill.shortlist { background: var(--short-bg); color: var(--short); }
+.pill.reject { background: var(--rej-bg); color: var(--rej); }
+.chart { direction: ltr; }
+.chart svg { width: 100%; height: auto; display: block; }
+.profile { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { background: var(--accent-soft); border-radius: 6px; padding: 2px 8px; font-size: .8rem; }
+.reasons { margin: 0; padding: 0 18px 0 0; font-size: .86rem; display: flex; flex-direction: column; gap: 3px; }
+.err { color: var(--rej); font-size: .88rem; }
+
+/* table */
+.tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tools input[type=text] { width: 180px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 6px 10px; cursor: pointer; font-size: .85rem; }
+.seg button[aria-pressed=true] { background: var(--accent); color: var(--on-accent); }
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th { text-align: start; font-size: .76rem; color: var(--muted); font-weight: 500; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tr.cand { cursor: pointer; }
+tr.cand:hover td { background: var(--accent-soft); }
+tr.cand.t-hire td:first-child { box-shadow: inset -3px 0 0 var(--hire); }
+tr.cand.t-shortlist td:first-child { box-shadow: inset -3px 0 0 var(--short); }
+tr.cand.t-reject td:first-child { box-shadow: inset -3px 0 0 var(--rej); }
+.bar { display: flex; align-items: center; gap: 8px; min-width: 120px; }
+.bar i { flex: 1; height: 6px; background: var(--line); border-radius: 3px; position: relative; overflow: hidden; }
+.bar i::after { content: ""; position: absolute; inset: 0 0 0 auto; width: var(--w); background: var(--accent); border-radius: 3px; }
+.bar b { font-variant-numeric: tabular-nums; min-width: 3.2em; }
+.name b { display: block; }
+.name small { color: var(--muted); }
+tr.detail td { background: var(--bg); font-size: .86rem; }
+.detail-grid { display: flex; flex-direction: column; gap: 8px; padding: 4px 0; }
+.empty { text-align: center; padding: 28px 12px; color: var(--muted); }
+
+.import { border: 1px dashed var(--line); border-radius: var(--r); padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: .9rem; }
+.fair { font-size: .85rem; color: var(--muted); border-inline-start: 3px solid var(--accent); padding-inline-start: 10px; }
+
+.toast { position: fixed; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: var(--bg); padding: 8px 16px; border-radius: 8px; font-size: .9rem; z-index: 20; max-width: calc(100% - 32px); }
+
+/* dashboard */
+.pill.done { background: var(--hire-bg); color: var(--hire); }
+.pill.open { background: var(--short-bg); color: var(--short); }
+.ok { color: var(--hire); } .warn { color: var(--short); }
+.dash { display: flex; flex-direction: column; gap: 18px; }
+.dash-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.dash-filters select { width: auto; min-width: 170px; }
+.dash-filters .spacer { flex: 1; }
+/* accounts */
+.login { min-height: 100vh; display: grid; place-items: center; padding: 20px; box-sizing: border-box; }
+.login-card { width: min(380px, 100%); box-sizing: border-box; }
+.login-card h1 { text-align: center; }
+.login-card p { margin: 0; }
+.login-card details summary { cursor: pointer; font-size: .85rem; }
+.login-card details[open] summary { margin-bottom: 8px; }
+.userbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: .9rem; }
+.userbar .pill { background: var(--accent-soft); color: var(--accent); }
+.inline { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.inline input { width: auto; flex: 1; min-width: 150px; }
+.roles { margin: 0; padding-inline-start: 18px; display: flex; flex-direction: column; gap: 6px; font-size: .9rem; }
+dialog { border: 1px solid var(--line); border-radius: var(--r); padding: 0; background: var(--surface); color: var(--ink); width: min(380px, 92vw); }
+dialog::backdrop { background: rgb(0 0 0 / .35); }
+.sync { font-size: .82rem; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+.sync::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.sync.ok::before { background: var(--hire); }
+.sync.bad { color: var(--rej); }
+.sync.bad::before { background: var(--rej); }
+a.btn { color: inherit; text-decoration: none; }
+.stat small { display: block; font-size: .76rem; color: var(--muted); }
+.meter { height: 6px; background: var(--line); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.meter i { display: block; height: 100%; width: var(--w); background: var(--accent); border-radius: 3px; }
+.dash-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.dash-grid .wide { grid-column: 1 / -1; }
+.card-head .muted { font-size: .82rem; }
+.legend { display: flex; gap: 6px 16px; flex-wrap: wrap; font-size: .8rem; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; margin-inline-end: 6px; vertical-align: -1px; }
+.hbars { display: flex; flex-direction: column; gap: 6px; }
+.hrow { display: grid; grid-template-columns: minmax(80px, 150px) minmax(0, 1fr) minmax(92px, auto); gap: 12px; align-items: center;
+  padding: 5px 6px; border-radius: 6px; cursor: pointer; }
+.hrow:hover, .hrow:focus-visible, .hrow.sel { background: var(--accent-soft); }
+.hrow .lbl { font-size: .88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.track { display: flex; gap: 2px; height: 14px; }
+.track i { flex: none; height: 100%; min-width: 3px; }
+.track i:last-child { border-start-end-radius: 4px; border-end-end-radius: 4px; }
+.f-fill { background: var(--accent); }
+.f-extra { background: var(--accent); opacity: .5; }
+.f-gap { background: repeating-linear-gradient(45deg, var(--line) 0 3px, transparent 3px 7px); box-shadow: inset 0 0 0 1px var(--line); }
+.c-emp { background: var(--accent); } .c-hire { background: var(--hire); } .c-short { background: var(--short); } .c-rej { background: var(--rej); }
+.hval { font-size: .84rem; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.hval b { color: var(--ink); }
+.donut { display: flex; gap: 18px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.donut svg { width: 170px; height: 170px; }
+.donut circle[data-ti] { cursor: pointer; }
+.donut circle[data-ti]:hover, .donut circle[data-ti]:focus-visible { stroke-width: 22; outline: none; }
+.dlegend { display: flex; flex-direction: column; gap: 8px; }
+.dlegend button { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 6px 10px; cursor: pointer; text-align: start; }
+.dlegend button[aria-pressed=true] { border-color: var(--accent); background: var(--accent-soft); }
+.dlegend b { font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+tr.job { cursor: pointer; }
+tr.job:hover td { background: var(--accent-soft); }
+.tip { position: fixed; z-index: 30; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px 10px; font-size: .82rem; pointer-events: none; min-width: 150px; box-shadow: 0 6px 18px rgb(0 0 0 / .14); }
+.tip .t { font-weight: 600; margin-bottom: 4px; }
+.tip .r { display: flex; justify-content: space-between; gap: 14px; }
+.tip .r span { color: var(--muted); }
+.tip .r b { font-variant-numeric: tabular-nums; }
+.tip .k { display: inline-block; width: 10px; height: 3px; border-radius: 2px; vertical-align: middle; margin-inline-end: 6px; }
+
+@media (max-width: 900px) {
+  .main { grid-template-columns: minmax(0, 1fr); }
+  .dash-grid { grid-template-columns: minmax(0, 1fr); }
+  .hrow { grid-template-columns: minmax(70px, 100px) minmax(0, 1fr) auto; gap: 8px; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stats .stat:last-child { grid-column: span 2; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="login" id="loginView" dir="rtl" lang="ar" hidden>
+  <form class="card login-card" id="loginForm">
+    <h1>مكتب التوظيف الذكي</h1>
+    <p class="muted" id="loginHint">سجّل الدخول للمتابعة</p>
+    <label class="field" id="lNameWrap" hidden><span>اسمك</span><input type="text" id="lName" autocomplete="name"></label>
+    <label class="field"><span>اسم المستخدم</span><input type="text" id="lUser" autocomplete="username" required dir="ltr"></label>
+    <label class="field"><span>كلمة المرور</span><input type="password" id="lPass" autocomplete="current-password" required dir="ltr"></label>
+    <label class="field" id="lPass2Wrap" hidden><span>تأكيد كلمة المرور</span><input type="password" id="lPass2" autocomplete="new-password" dir="ltr"></label>
+    <button class="btn primary" type="submit" id="lSubmit">دخول</button>
+    <p class="err" id="lErr" role="alert" hidden></p>
+    <p class="muted" style="font-size:.82rem">ما عندك حساب؟ اطلبه من مدير النظام.</p>
+    <details id="lSheet"><summary class="muted">رابط Google Sheet</summary>
+      <div class="inline"><input type="url" id="lSheetUrl" dir="ltr" placeholder="https://script.google.com/macros/s/.../exec">
+        <button class="btn" type="button" id="lSheetSave">حفظ</button></div></details>
+  </form>
+</div>
+
+</head>
+<body>
+<div class="app" id="appRoot" dir="rtl" lang="ar" hidden>
+  <header class="top">
+    <div class="brand">
+      <h1>مكتب التوظيف الذكي</h1>
+      <p>تقييم المرشحين بالمنطق الضبابي: الخبرة، المهارة، المقابلة، وملاءمة الراتب</p>
+    </div>
+    <div class="seg" role="group" aria-label="العرض" id="viewSeg">
+      <button type="button" data-v="hire" aria-pressed="true">التوظيف</button>
+      <button type="button" data-v="dash" aria-pressed="false">لوحة المعلومات</button>
+      <button type="button" data-v="users" aria-pressed="false" hidden>المستخدمون</button>
+    </div>
+    <div class="jobbar" id="jobBar">
+      <label for="jobSelect">الوظيفة</label>
+      <select id="jobSelect" style="width:auto;min-width:180px"></select>
+      <button class="btn" id="newJobBtn" type="button">+ وظيفة جديدة</button>
+    </div>
+    <div class="userbar" id="userBar" hidden>
+      <span>مرحباً، <b id="uName"></b></span><span class="pill" id="uRole"></span>
+      <button class="btn ghost" type="button" id="pwBtn">تغيير كلمة المرور</button>
+      <button class="btn ghost" type="button" id="logoutBtn">تسجيل الخروج</button>
+    </div>
+  </header>
+
+  <div class="banner" id="modeBanner" hidden></div>
+
+  <details class="panel" id="settingsPanel">
+    <summary><span>إعدادات الوظيفة</span><span class="muted num" id="settingsSummary"></span></summary>
+    <form class="settings" id="jobForm">
+      <label class="field"><span>المسمى الوظيفي</span><input type="text" id="jTitle" required></label>
+      <label class="field"><span>القسم</span><input type="text" id="jDept" list="deptList" placeholder="مثال: تقنية المعلومات"><datalist id="deptList"></datalist></label>
+      <label class="field"><span>العدد المطلوب (الاحتياج)</span><input type="number" id="jHead" min="0" step="1"><small>عدد الموظفين المطلوب تعيينهم</small></label>
+      <label class="field"><span>الميزانية الشهرية (ريال)</span><input type="number" id="jBudget" min="0" step="100"></label>
+      <label class="field"><span>حد التوصية بالتوظيف</span><input type="number" id="jHire" min="0" max="100" step="1"><small>الدرجة من هذا الحد فأعلى</small></label>
+      <label class="field"><span>حد القائمة المختصرة</span><input type="number" id="jShort" min="0" max="100" step="1"></label>
+      <label class="field"><span>أدنى درجة مقابلة مقبولة</span><input type="number" id="jMinInt" min="0" max="10" step="0.5"></label>
+      <label class="field"><span>أدنى درجة مهارة مقبولة</span><input type="number" id="jMinSkill" min="0" max="10" step="0.5"></label>
+      <div class="actions"><button class="btn primary" type="submit" id="jSave">حفظ الإعدادات</button>
+        <button class="btn danger" type="button" id="jDelete">حذف الوظيفة</button></div>
+      <p class="err" id="jErr" hidden></p>
+    </form>
+    <div class="settings" id="sheetBox">
+      <label class="field" style="grid-column:1/-1"><span>رابط Google Sheet (Apps Script) للإرسال التلقائي</span>
+        <input type="url" id="sheetUrl" dir="ltr" placeholder="https://script.google.com/macros/s/.../exec">
+        <small>مزامنة بالاتجاهين مع تبويبات: المرشحون، الموظفين، الوظائف، ولوحة المعلومات. ما تحفظه هنا يُرسل للشيت، وما تعدّله في الشيت يظهر هنا وفي لوحة المعلومات خلال ثوانٍ. طريقة الإعداد في ملف google_sheet_script.gs</small></label>
+      <div class="actions"><button class="btn primary" type="button" id="sheetSave">حفظ الرابط</button>
+        <button class="btn" type="button" id="sheetSyncAll">مزامنة الآن</button></div>
+    </div>
+  </details>
+
+  <section class="stats" aria-label="ملخص" id="statsBar">
+    <div class="stat"><b id="sTotal">0</b><span>مرشح لهذه الوظيفة</span></div>
+    <div class="stat hire"><b id="sHire">0</b><span>توصية بالتوظيف</span></div>
+    <div class="stat short"><b id="sShort">0</b><span>قائمة مختصرة</span></div>
+    <div class="stat rej"><b id="sRej">0</b><span>رفض</span></div>
+    <div class="stat"><b id="sAvg">–</b><span>متوسط درجة القبول</span></div>
+  </section>
+
+  <div class="main" id="mainView">
+    <section class="card" aria-labelledby="formTitle">
+      <div class="card-head"><h2 id="formTitle">تقديم مرشح جديد</h2>
+        <button class="btn ghost" type="button" id="cancelEdit" hidden>إلغاء التعديل</button></div>
+      <form id="candForm" class="card" style="padding:0;border:0">
+        <label class="field"><span>اسم المرشح</span><input type="text" id="cName" required autocomplete="off"></label>
+        <label class="field"><span>البريد أو الجوال (اختياري)</span><input type="text" id="cContact" autocomplete="off"></label>
+        <div class="row2">
+          <label class="field"><span>سنوات الخبرة</span><input type="number" id="cExp" min="0" step="0.5" value="3" required></label>
+          <label class="field"><span>الراتب المتوقع (اختياري)</span><input type="number" id="cSal" min="0" step="100" placeholder="ريال شهرياً"></label>
+        </div>
+        <div class="slider"><div class="lab"><label for="cSkill">المهارة التقنية (0–10)</label><output id="oSkill" for="cSkill">7</output></div>
+          <input type="range" id="cSkill" min="0" max="10" step="0.5" value="7"></div>
+        <div class="slider"><div class="lab"><label for="cInt">أداء المقابلة (0–10)</label><output id="oInt" for="cInt">7</output></div>
+          <input type="range" id="cInt" min="0" max="10" step="0.5" value="7"></div>
+        <label class="field"><span>ملاحظات المقابلة (اختياري)</span><textarea id="cNotes"></textarea></label>
+        <div class="actions"><button class="btn primary" type="submit" id="cSubmit">حفظ المرشح</button></div>
+        <p class="err" id="cErr" hidden></p>
+      </form>
+
+      <div class="readout" aria-live="polite">
+        <div class="scoreline"><span class="big num" id="pScore">–</span><span id="pDecision"></span></div>
+        <div class="chart" id="pChart"></div>
+        <div class="profile" id="pProfile"></div>
+        <ol class="reasons" id="pReasons"></ol>
+      </div>
+      <p class="fair">العدالة: التقييم لا يستخدم الاسم أو الجنس أو العمر أو الجنسية. الاسم للعرض فقط، ولا تُطلب البيانات الشخصية الأخرى.</p>
+    </section>
+
+    <section class="card" aria-labelledby="listTitle">
+      <div class="card-head">
+        <h2 id="listTitle">ترتيب المرشحين <span class="muted num" id="fillBadge" style="font-size:.82rem;font-weight:400"></span></h2>
+        <div class="tools">
+          <input type="text" id="search" placeholder="بحث بالاسم" aria-label="بحث بالاسم">
+          <div class="seg" role="group" aria-label="تصفية بالقرار" id="filterSeg">
+            <button type="button" data-f="all" aria-pressed="true">الكل</button>
+            <button type="button" data-f="hire" aria-pressed="false">توظيف</button>
+            <button type="button" data-f="shortlist" aria-pressed="false">مختصرة</button>
+            <button type="button" data-f="reject" aria-pressed="false">رفض</button>
+          </div>
+        </div>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>#</th><th>المرشح</th><th>درجة القبول</th><th>القرار</th><th>خبرة</th><th>مهارة</th><th>مقابلة</th><th>الراتب</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="tools">
+        <label class="btn" for="fileInput">استيراد من Excel / CSV</label>
+        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+        <button class="btn" type="button" id="exportBtn">تصدير تقرير Excel</button>
+        <button class="btn" type="button" id="templateBtn">تنزيل نموذج فارغ</button>
+      </div>
+      <div class="import" id="importBox" hidden></div>
+    </section>
+  </div>
+
+  <section class="dash" id="dash" hidden aria-label="لوحة المعلومات">
+    <div class="dash-filters">
+      <select id="dDept" aria-label="تصفية بالقسم"></select>
+      <div class="seg" role="group" aria-label="تصفية بحالة الاحتياج" id="dStatus">
+        <button type="button" data-s="all" aria-pressed="true">كل الوظائف</button>
+        <button type="button" data-s="done" aria-pressed="false">مكتمل</button>
+        <button type="button" data-s="open" aria-pressed="false">غير مكتمل</button>
+      </div>
+      <button class="btn ghost" type="button" id="dReset" hidden>مسح التصفية</button>
+      <span class="spacer"></span>
+      <span class="sync" id="dSync" role="status"></span>
+      <button class="btn ghost" type="button" id="dSyncBtn" hidden>مزامنة الآن</button>
+      <a class="btn" id="dSheetLink" target="_blank" rel="noopener" hidden>فتح Google Sheet</a>
+      <button class="btn" type="button" id="dExport">تصدير اللوحة Excel</button>
+    </div>
+    <div class="stats" id="dKpis"></div>
+    <div class="dash-grid">
+      <section class="card" aria-labelledby="dDeptTitle">
+        <div class="card-head"><h2 id="dDeptTitle">اكتمال الاحتياج حسب القسم</h2><span class="muted">اضغط على قسم لتصفية اللوحة</span></div>
+        <div class="legend"><span><i class="f-fill"></i>تم تعيينهم</span><span><i class="f-gap"></i>المتبقي من الاحتياج</span><span><i class="f-extra"></i>فوق الاحتياج</span></div>
+        <div class="hbars" id="dDeptChart"></div>
+      </section>
+      <section class="card" aria-labelledby="dDonutTitle">
+        <div class="card-head"><h2 id="dDonutTitle">حالة الوظائف</h2></div>
+        <div class="donut" id="dDonut"></div>
+      </section>
+      <section class="card wide" aria-labelledby="dCandTitle">
+        <div class="card-head"><h2 id="dCandTitle">المرشحون والموظفون حسب القسم</h2></div>
+        <div class="legend"><span><i class="c-emp"></i>موظف (تم تعيينه)</span><span><i class="c-hire"></i>توصية بالتوظيف</span><span><i class="c-short"></i>قائمة مختصرة</span><span><i class="c-rej"></i>رفض</span></div>
+        <div class="hbars" id="dCandChart"></div>
+      </section>
+      <section class="card wide" aria-labelledby="dJobsTitle">
+        <div class="card-head"><h2 id="dJobsTitle">الوظائف والاحتياج</h2><span class="muted">اضغط على وظيفة لفتحها</span></div>
+        <div class="tablewrap"><table>
+          <thead><tr><th>الوظيفة</th><th>القسم</th><th>المطلوب</th><th>تم تعيينهم</th><th>المتبقي</th><th>جاهز للتعيين</th><th>الاكتمال</th><th>الحالة</th></tr></thead>
+          <tbody id="dJobs"></tbody></table></div>
+      </section>
+      <section class="card wide" aria-labelledby="dEmpTitle">
+        <div class="card-head"><h2 id="dEmpTitle">الموظفون</h2>
+          <input type="text" id="dEmpSearch" placeholder="بحث بالاسم" aria-label="بحث في الموظفين" style="width:180px"></div>
+        <div class="tablewrap"><table>
+          <thead><tr><th>الموظف</th><th>الوظيفة</th><th>القسم</th><th>درجة القبول</th><th>تاريخ التعيين</th></tr></thead>
+          <tbody id="dEmps"></tbody></table></div>
+      </section>
+    </div>
+  </section>
+  <section class="dash" id="usersView" hidden aria-label="المستخدمون">
+    <div class="dash-grid">
+      <section class="card" aria-labelledby="uAddTitle">
+        <div class="card-head"><h2 id="uAddTitle">إضافة مستخدم</h2></div>
+        <form id="uForm" class="card" style="padding:0;border:0" autocomplete="off">
+          <label class="field"><span>الاسم</span><input type="text" id="uNewName" required></label>
+          <label class="field"><span>اسم المستخدم (للدخول)</span><input type="text" id="uNewUser" required dir="ltr" autocomplete="off"><small>3 أحرف على الأقل، بدون مسافات</small></label>
+          <label class="field"><span>كلمة المرور</span>
+            <div class="inline"><input type="text" id="uNewPass" required dir="ltr" autocomplete="off" minlength="8">
+              <button class="btn" type="button" id="uGen">توليد</button></div>
+            <small>8 أحرف على الأقل. أعطها للمستخدم، ويقدر يغيّرها بعد الدخول.</small></label>
+          <label class="field"><span>الصلاحية</span><select id="uNewRole">
+            <option value="hr">موارد بشرية</option><option value="viewer">مشاهد</option><option value="admin">مدير</option></select></label>
+          <div class="actions"><button class="btn primary" type="submit" id="uAdd">إنشاء الحساب</button></div>
+          <p class="err" id="uErr" hidden></p>
+        </form>
+      </section>
+      <section class="card" aria-labelledby="uRolesTitle">
+        <div class="card-head"><h2 id="uRolesTitle">الصلاحيات</h2></div>
+        <ul class="roles">
+          <li><b>مدير:</b> كل شيء، وإدارة المستخدمين ورابط الشيت.</li>
+          <li><b>موارد بشرية:</b> إضافة وتعديل المرشحين والوظائف والتعيين، ولوحة المعلومات.</li>
+          <li><b>مشاهد:</b> لوحة المعلومات فقط، بدون أي تعديل.</li>
+        </ul>
+        <div class="field"><span>رابط Excel (للقراءة فقط، لا تشاركه إلا مع من تثق به)</span>
+          <div class="inline"><input type="text" id="uCsv" dir="ltr" readonly placeholder="اضغط «إظهار»">
+            <button class="btn" type="button" id="uCsvShow">إظهار</button>
+            <button class="btn ghost" type="button" id="uCsvReset" title="الرابط القديم يتوقف">رابط جديد</button></div>
+          <small>Excel ← Data ← From Web ← الصق الرابط. طريقة التحديث التلقائي في ملف google_sheet_script.gs</small></div>
+      </section>
+      <section class="card wide" aria-labelledby="uListTitle">
+        <div class="card-head"><h2 id="uListTitle">الحسابات</h2>
+          <button class="btn ghost" type="button" id="uReload">تحديث</button></div>
+        <div class="tablewrap"><table>
+          <thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الصلاحية</th><th>الحالة</th><th>آخر دخول</th><th></th></tr></thead>
+          <tbody id="uRows"></tbody></table></div>
+      </section>
+    </div>
+  </section>
+</div>
+<dialog id="pwDialog" dir="rtl" lang="ar">
+  <form id="pwForm" class="card" style="border:0">
+    <h2>تغيير كلمة المرور</h2>
+    <label class="field"><span>كلمة المرور الحالية</span><input type="password" id="pwOld" required autocomplete="current-password" dir="ltr"></label>
+    <label class="field"><span>كلمة المرور الجديدة</span><input type="password" id="pwNew" required minlength="8" autocomplete="new-password" dir="ltr"></label>
+    <label class="field"><span>تأكيد كلمة المرور الجديدة</span><input type="password" id="pwNew2" required autocomplete="new-password" dir="ltr"></label>
+    <div class="actions"><button class="btn primary" type="submit" id="pwSave">حفظ</button>
+      <button class="btn" type="button" id="pwCancel">إلغاء</button></div>
+    <p class="err" id="pwErr" hidden></p>
+  </form>
+</dialog>
+<div class="toast" id="toast" hidden></div>
+<div class="tip" id="tip" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ===== Fuzzy engine: a faithful port of hr_fuzzy_system.py (scikit-fuzzy, Mamdani, centroid) =====
+const Fuzzy = (() => {
+  const trimf = (x, [a, b, c]) => {
+    let y = 0;
+    if (a !== b && a < x && x < b) y = (x - a) / (b - a);
+    if (b !== c && b < x && x < c) y = (c - x) / (c - b);
+    if (x === b) y = 1;
+    return y;
+  };
+  const trapmf = (x, [a, b, c, d]) => {
+    if (x <= b) return trimf(x, [a, b, b]);
+    if (x >= c) return trimf(x, [c, c, d]);
+    return 1;
+  };
+  const mf = (kind, p) => (x) => (kind === "tri" ? trimf(x, p) : trapmf(x, p));
+
+  const VARS = {
+    experience: { low: mf("tri", [0, 0, 5]), medium: mf("tri", [2, 5, 8]), high: mf("tri", [5, 10, 10]) },
+    skill: { weak: mf("tri", [0, 0, 5]), medium: mf("tri", [2, 5, 8]), strong: mf("tri", [5, 10, 10]) },
+    interview: { poor: mf("tri", [0, 0, 5]), good: mf("tri", [2, 5, 8]), excellent: mf("tri", [5, 10, 10]) },
+    salary: { within: mf("trap", [0.4, 0.4, 1.0, 1.1]), slightly_over: mf("tri", [1.0, 1.15, 1.3]), far_over: mf("trap", [1.2, 1.35, 1.6, 1.6]) },
+  };
+  const OUT = { low: mf("trap", [0, 0, 15, 40]), medium: mf("tri", [30, 50, 70]), high: mf("trap", [60, 85, 100, 100]) };
+  const UNIVERSE = Array.from({ length: 201 }, (_, i) => i * 0.5);
+
+  const CRITERIA_AR = { experience: "سنوات الخبرة", skill: "المهارة التقنية", interview: "أداء المقابلة", salary: "ملاءمة الراتب" };
+  const TERMS_AR = {
+    low: "منخفضة", medium: "متوسطة", high: "عالية", weak: "ضعيفة", strong: "قوية",
+    poor: "ضعيف", good: "جيد", excellent: "ممتاز",
+    within: "ضمن الميزانية", slightly_over: "أعلى قليلاً من الميزانية", far_over: "أعلى بكثير من الميزانية",
+  };
+
+  const BASE_RULES = [
+    { if: [["experience", "high"], ["skill", "strong"], ["interview", "excellent"]], then: "high", text: "خبرة عالية + مهارة قوية + مقابلة ممتازة" },
+    { if: [["experience", "medium"], ["skill", "medium"], ["interview", "good"]], then: "medium", text: "خبرة ومهارة متوسطة مع مقابلة جيدة" },
+    { if: [["interview", "poor"]], then: "low", text: "أداء المقابلة ضعيف" },
+    { if: [["experience", "low"], ["skill", "strong"]], then: "medium", text: "المهارة القوية تعوّض قلة الخبرة" },
+    { if: [["skill", "weak"]], then: "low", text: "المهارة التقنية ضعيفة" },
+    { if: [["skill", "strong"], ["interview", "excellent"]], then: "high", text: "مهارة قوية مع مقابلة ممتازة" },
+    { if: [["skill", "strong"], ["interview", "good"]], then: "high", text: "مهارة قوية مع مقابلة جيدة" },
+    { if: [["experience", "high"], ["skill", "medium"], ["interview", "good"]], then: "medium", text: "خبرة عالية لكن المهارة متوسطة" },
+    { if: [["skill", "medium"], ["interview", "good"]], then: "medium", text: "مهارة متوسطة مع مقابلة جيدة" },
+    { if: [["experience", "low"], ["skill", "medium"]], then: "low", text: "خبرة قليلة ومهارة متوسطة" },
+    { if: [["skill", "medium"], ["interview", "excellent"]], then: "medium", text: "مقابلة ممتازة مع مهارة متوسطة" },
+  ];
+  const SALARY_RULES = [
+    { if: [["salary", "within"], ["skill", "strong"]], then: "high", text: "مرشح قوي وراتبه ضمن الميزانية" },
+    { if: [["salary", "slightly_over"]], then: "medium", text: "الراتب المتوقع أعلى قليلاً من الميزانية (قابل للتفاوض)" },
+    { if: [["salary", "far_over"]], then: "low", text: "الراتب المتوقع أعلى بكثير من الميزانية" },
+  ];
+
+  const clip = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+  const memberships = (name, v) => Object.fromEntries(Object.entries(VARS[name]).map(([t, f]) => [t, f(v)]));
+
+  // Builds the aggregated output set exactly as skfuzzy does: the universe plus every point
+  // where a term crosses its cut level, then max(min(cut, term)).
+  function aggregate(cuts) {
+    const extra = [];
+    for (const [t, cut] of Object.entries(cuts)) {
+      const f = OUT[t];
+      for (let i = 1; i < UNIVERSE.length; i++) {
+        const x1 = UNIVERSE[i - 1], x2 = UNIVERSE[i], y1 = f(x1) - cut, y2 = f(x2) - cut;
+        if (y1 !== 0 && y2 !== 0 && (y1 < 0) !== (y2 < 0)) extra.push(x1 + (x2 - x1) * (-y1 / (y2 - y1)));
+      }
+    }
+    const xs = [...new Set([...UNIVERSE, ...extra])].sort((a, b) => a - b);
+    const ys = xs.map((x) => Math.max(0, ...Object.entries(cuts).map(([t, c]) => Math.min(c, OUT[t](x)))));
+    return { xs, ys };
+  }
+
+  function centroid(xs, ys) {
+    let m = 0, a = 0;
+    for (let i = 1; i < xs.length; i++) {
+      const x1 = xs[i - 1], x2 = xs[i], y1 = ys[i - 1], y2 = ys[i];
+      if ((y1 === 0 && y2 === 0) || x1 === x2) continue;
+      const area = 0.5 * (x2 - x1) * (y1 + y2);
+      m += (x1 + ((x2 - x1) * (y1 + 2 * y2)) / (3 * (y1 + y2))) * area;
+      a += area;
+    }
+    return m / Math.max(a, Number.EPSILON);
+  }
+
+  const DEFAULT_JOB = { title: "مطوّر برمجيات", budget: 12000, hire: 65, shortlist: 45, minInterview: 3, minSkill: 3 };
+
+  function num(v) {
+    if (v === null || v === undefined || (typeof v === "string" && v.trim() === "")) return null;
+    const n = Number(typeof v === "string" ? v.replace(/[,،\s]/g, "").replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)) : v);
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  function evaluate(c, job = DEFAULT_JOB) {
+    const raw = { experience: num(c.experience), skill: num(c.skill), interview: num(c.interview) };
+    for (const [k, v] of Object.entries(raw)) {
+      if (v === null || Number.isNaN(v) || v < 0) throw new Error(`قيمة غير صالحة في «${CRITERIA_AR[k]}»`);
+    }
+    const inputs = { experience: clip(raw.experience, 0, 10), skill: clip(raw.skill, 0, 10), interview: clip(raw.interview, 0, 10) };
+    const sal = num(c.expected_salary);
+    if (Number.isNaN(sal) || (sal !== null && sal < 0)) throw new Error("قيمة غير صالحة في «الراتب المتوقع»");
+    const useSalary = sal !== null && sal > 0 && job.budget > 0;
+    const ratio = useSalary ? sal / job.budget : null;
+    if (useSalary) inputs.salary = clip(ratio, 0.5, 1.5);
+    const rules = useSalary ? BASE_RULES.concat(SALARY_RULES) : BASE_RULES;
+
+    const mems = Object.fromEntries(Object.keys(inputs).map((k) => [k, memberships(k, inputs[k])]));
+    const cuts = { low: 0, medium: 0, high: 0 };
+    const fired = [];
+    for (const r of rules) {
+      const s = Math.min(...r.if.map(([v, t]) => mems[v][t]));
+      cuts[r.then] = Math.max(cuts[r.then], s);
+      if (s > 0.05) fired.push({ s, r });
+    }
+    const agg = aggregate(cuts);
+    const exact = centroid(agg.xs, agg.ys);
+    const score = Math.round(exact * 10) / 10;
+
+    const failed = [];
+    if (inputs.interview < job.minInterview) failed.push(CRITERIA_AR.interview);
+    if (inputs.skill < job.minSkill) failed.push(CRITERIA_AR.skill);
+    let decision, tier;
+    if (failed.length) { decision = "رفض (لم يحقق الحد الأدنى)"; tier = "reject"; }
+    else if (score >= job.hire) { decision = "توصية بالتوظيف"; tier = "hire"; }
+    else if (score >= job.shortlist) { decision = "قائمة مختصرة / مقابلة ثانية"; tier = "shortlist"; }
+    else { decision = "رفض"; tier = "reject"; }
+
+    const profile = Object.entries(mems).map(([k, m]) => {
+      const best = Object.keys(m).reduce((a, b) => (m[b] > m[a] ? b : a));
+      return { key: k, label: CRITERIA_AR[k], term: TERMS_AR[best], degree: m[best] };
+    });
+    fired.sort((a, b) => b.s - a.s);
+    const reasons = fired.slice(0, 3).map(({ s, r }) => ({ text: r.text, out: TERMS_AR[r.then], outKey: r.then, strength: s }));
+
+    return { score, exact, decision, tier, failed, profile, reasons, ratio, cuts, agg };
+  }
+
+  return { evaluate, DEFAULT_JOB, OUT, CRITERIA_AR, num };
+})();
+
+// ===== App =====
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = (n) => (n === null || n === undefined || n === "" ? "–" : Number(n).toLocaleString("en-US"));
+const pct = (x) => Math.round(x * 100) + "%";
+
+const state = {
+  db: null, downloads: null, local: false, readOnly: false,
+  jobs: [], candidates: [], jobId: null,
+  editingId: null, expandedId: null, filter: "all", search: "", pendingImport: null,
+  view: "hire", dDept: "", dStatus: "all", dEmpSearch: "",
+};
+try { state.jobId = localStorage.getItem("hr.job") || null; state.view = ["dash", "users"].includes(localStorage.getItem("hr.view")) ? localStorage.getItem("hr.view") : "hire"; } catch {}
+
+let toastTimer;
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 2600);
+}
+
+const currentJob = () => state.jobs.find((j) => j.id === state.jobId) || null;
+const jobCfg = (j) => ({ department: "", headcount: 1, ...Fuzzy.DEFAULT_JOB, ...(j || {}) });
+const deptOf = (j) => String(j?.department ?? "").trim() || "بدون قسم";
+const neededOf = (j) => Math.max(0, Math.round(Number(jobCfg(j).headcount) || 0));
+
+// ---------- live preview chart ----------
+function chartSVG(res, job) {
+  const W = 560, H = 170, L = 14, R = 14, T = 14, B = 26;
+  const x = (v) => L + (v / 100) * (W - L - R);
+  const y = (v) => T + (1 - v) * (H - T - B);
+  const outline = Object.entries(Fuzzy.OUT).map(([t, f]) => {
+    const pts = []; for (let v = 0; v <= 100; v += 1) pts.push(`${x(v).toFixed(1)},${y(f(v)).toFixed(1)}`);
+    return `<polyline points="${pts.join(" ")}" fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>`;
+  }).join("");
+  const area = `<polygon points="${x(0)},${y(0)} ${res.agg.xs.map((v, i) => `${x(v).toFixed(1)},${y(res.agg.ys[i]).toFixed(1)}`).join(" ")} ${x(100)},${y(0)}" fill="var(--accent)" fill-opacity=".28" stroke="var(--accent)" stroke-width="1.5"/>`;
+  const th = [[job.shortlist, "var(--short)"], [job.hire, "var(--hire)"]].map(([v, c]) =>
+    `<line x1="${x(v)}" x2="${x(v)}" y1="${T}" y2="${y(0)}" stroke="${c}" stroke-width="1.5"/>`).join("");
+  const cx = x(res.exact);
+  const ticks = [0, 25, 50, 75, 100].map((v) => `<text x="${x(v)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="var(--muted)">${v}</text>`).join("");
+  const labels = [["منخفضة", 12], ["متوسطة", 50], ["عالية", 88]].map(([t, v]) =>
+    `<text x="${x(v)}" y="${T + 8}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${t}</text>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="مجموعة القبول الضبابية ومركز الثقل عند ${res.score}">
+    <line x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)"/>
+    ${outline}${area}${th}${labels}
+    <line x1="${cx}" x2="${cx}" y1="${T}" y2="${y(0)}" stroke="var(--ink)" stroke-width="2"/>
+    <circle cx="${cx}" cy="${y(0)}" r="4" fill="var(--ink)"/>
+    ${ticks}</svg>`;
+}
+
+function readForm() {
+  return {
+    name: $("cName").value.trim(), contact: $("cContact").value.trim(),
+    experience: $("cExp").value, skill: $("cSkill").value, interview: $("cInt").value,
+    expected_salary: $("cSal").value, notes: $("cNotes").value.trim(),
+  };
+}
+
+function renderPreview() {
+  $("oSkill").textContent = $("cSkill").value;
+  $("oInt").textContent = $("cInt").value;
+  const job = jobCfg(currentJob());
+  let res;
+  try { res = Fuzzy.evaluate(readForm(), job); }
+  catch (e) {
+    $("pScore").textContent = "–"; $("pDecision").innerHTML = `<span class="err">${esc(e.message)}</span>`;
+    $("pChart").innerHTML = ""; $("pProfile").innerHTML = ""; $("pReasons").innerHTML = ""; return;
+  }
+  $("pScore").innerHTML = `${res.score}<small>/100</small>`;
+  $("pDecision").innerHTML = `<span class="pill ${res.tier}">${esc(res.decision)}</span>`;
+  $("pChart").innerHTML = chartSVG(res, job);
+  $("pProfile").innerHTML = res.profile.map((p) => `<span class="chip">${esc(p.label)}: ${esc(p.term)} <span class="num">${pct(p.degree)}</span></span>`).join("")
+    + (res.ratio ? `<span class="chip">الراتب = <span class="num">${res.ratio.toFixed(2)}</span> × الميزانية</span>` : "");
+  $("pReasons").innerHTML = reasonsHTML(res);
+}
+
+function reasonsHTML(res) {
+  const items = res.reasons.map((r) => `<li>${esc(r.text)} ← قبول ${esc(r.out)} <span class="muted num">(قوة ${pct(r.strength)})</span></li>`);
+  if (res.failed.length) items.unshift(`<li class="err">لم يحقق الحد الأدنى في: ${esc(res.failed.join("، "))}</li>`);
+  return items.join("");
+}
+
+// ---------- ranking ----------
+function ranked() {
+  const job = jobCfg(currentJob());
+  return state.candidates.filter((c) => c.jobId === state.jobId).map((c) => {
+    let res = null, error = null;
+    try { res = Fuzzy.evaluate(c, job); } catch (e) { error = e.message; }
+    return { c, res, error };
+  }).sort((a, b) => (b.res?.exact ?? -1) - (a.res?.exact ?? -1) || (a.c.createdAt || 0) - (b.c.createdAt || 0));
+}
+
+function renderList() {
+  const rows = ranked();
+  const ok = rows.filter((r) => r.res);
+  $("sTotal").textContent = rows.length;
+  $("sHire").textContent = ok.filter((r) => r.res.tier === "hire").length;
+  $("sShort").textContent = ok.filter((r) => r.res.tier === "shortlist").length;
+  $("sRej").textContent = ok.filter((r) => r.res.tier === "reject").length;
+  $("sAvg").textContent = ok.length ? (ok.reduce((s, r) => s + r.res.score, 0) / ok.length).toFixed(1) : "–";
+  const need = neededOf(currentJob()), hiredN = rows.filter((r) => r.c.hired).length;
+  $("fillBadge").textContent = state.jobId ? `· تم تعيين ${hiredN} من ${need} ${hiredN >= need ? "✓ مكتمل" : "· ينقص " + (need - hiredN)}` : "";
+  renderDash();
+
+  const q = state.search.trim();
+  const shown = rows.map((r, i) => ({ ...r, rank: i + 1 }))
+    .filter((r) => state.filter === "all" || r.res?.tier === state.filter)
+    .filter((r) => !q || (r.c.name || "").includes(q));
+
+  const tb = $("tbody");
+  if (!state.jobId) { tb.innerHTML = `<tr><td colspan="8" class="empty">أنشئ وظيفة أولاً من زر «+ وظيفة جديدة».</td></tr>`; return; }
+  if (!rows.length) { tb.innerHTML = `<tr><td colspan="8" class="empty">لا يوجد مرشحون بعد. أضف أول مرشح من النموذج، أو استورد ملف Excel.</td></tr>`; return; }
+  if (!shown.length) { tb.innerHTML = `<tr><td colspan="8" class="empty">لا توجد نتائج مطابقة.</td></tr>`; return; }
+
+  tb.innerHTML = shown.map(({ c, res, error, rank }) => {
+    const tier = res?.tier || "reject";
+    const main = `<tr class="cand t-${tier}" data-id="${esc(c.id)}" tabindex="0" aria-expanded="${state.expandedId === c.id}">
+      <td class="num">${rank}</td>
+      <td class="name"><b>${esc(c.name || "بدون اسم")} ${c.hired ? `<span class="pill done">✓ موظف</span>` : ""}</b>${c.contact ? `<small dir="ltr">${esc(c.contact)}</small>` : ""}</td>
+      <td>${res ? `<div class="bar"><i style="--w:${res.score}%"></i><b>${res.score}</b></div>` : `<span class="err">${esc(error)}</span>`}</td>
+      <td>${res ? `<span class="pill ${tier}">${esc(res.decision)}</span>` : ""}</td>
+      <td class="num">${fmt(c.experience)}</td><td class="num">${fmt(c.skill)}</td><td class="num">${fmt(c.interview)}</td>
+      <td class="num">${fmt(c.expected_salary)}</td></tr>`;
+    if (state.expandedId !== c.id) return main;
+    return main + `<tr class="detail"><td colspan="8"><div class="detail-grid">
+      ${res ? `<div class="profile">${res.profile.map((p) => `<span class="chip">${esc(p.label)}: ${esc(p.term)} <span class="num">${pct(p.degree)}</span></span>`).join("")}</div>
+      <ol class="reasons">${reasonsHTML(res)}</ol>` : ""}
+      ${c.notes ? `<div><b>ملاحظات:</b> ${esc(c.notes)}</div>` : ""}
+      <div class="actions" id="act-${esc(c.id)}">
+        ${state.readOnly ? "" : `<button class="btn ${c.hired ? "" : "primary"}" type="button" data-hire="${esc(c.id)}">${c.hired ? "إلغاء التعيين" : "تعيين كموظف"}</button>
+        <button class="btn" type="button" data-edit="${esc(c.id)}">تعديل</button>
+        <button class="btn danger" type="button" data-del="${esc(c.id)}">حذف</button>`}
+      </div></div></td></tr>`;
+  }).join("");
+}
+
+function renderJobs() {
+  const sel = $("jobSelect");
+  sel.innerHTML = state.jobs.length
+    ? state.jobs.map((j) => `<option value="${esc(j.id)}">${esc(j.title)}</option>`).join("")
+    : `<option value="">لا توجد وظائف</option>`;
+  if (!state.jobs.some((j) => j.id === state.jobId)) state.jobId = state.jobs[0]?.id || null;
+  sel.value = state.jobId || "";
+  const j = currentJob();
+  const cfg = jobCfg(j);
+  $("settingsSummary").textContent = j
+    ? `${deptOf(j)} · الاحتياج ${neededOf(j)} · الميزانية ${fmt(cfg.budget)} ريال · توظيف ≥ ${cfg.hire} · مختصرة ≥ ${cfg.shortlist} · حد أدنى: مقابلة ${cfg.minInterview}، مهارة ${cfg.minSkill}`
+    : "";
+  $("deptList").innerHTML = [...new Set(state.jobs.map((x) => String(x.department ?? "").trim()).filter(Boolean))]
+    .map((d) => `<option value="${esc(d)}"></option>`).join("");
+  if (document.activeElement?.closest?.("#jobForm") == null) fillJobForm(j);
+  $("jDelete").hidden = !j || state.readOnly;
+}
+
+function fillJobForm(j) {
+  const c = jobCfg(j);
+  $("jTitle").value = j ? c.title : ""; $("jDept").value = j ? c.department : ""; $("jHead").value = neededOf(j);
+  $("jBudget").value = c.budget; $("jHire").value = c.hire;
+  $("jShort").value = c.shortlist; $("jMinInt").value = c.minInterview; $("jMinSkill").value = c.minSkill;
+}
+
+function renderAll() { renderJobs(); renderList(); renderPreview(); applyReadOnly(); }
+
+function applyReadOnly() {
+  const ro = state.readOnly;
+  ["cSubmit", "jSave", "newJobBtn"].forEach((id) => ($(id).disabled = ro));
+  $("fileInput").disabled = ro;
+}
+
+// ---------- storage (shared db, or this browser's storage when unavailable) ----------
+const LOCAL_KEY = "hr.data.v1";
+function persistLocal() {
+  try { localStorage.setItem(LOCAL_KEY, JSON.stringify({ jobs: state.jobs, candidates: state.candidates })); } catch {}
+}
+function loadLocal() {
+  try { const d = JSON.parse(localStorage.getItem(LOCAL_KEY) || "null"); if (d && Array.isArray(d.jobs)) return d; } catch {}
+  return null;
+}
+const store = {
+  async saveJob(id, data, quiet = false) {
+    if (!quiet) { data = { ...data, updatedAt: Date.now() }; sheet.push("upsert", [{ id, ...data }], "jobs"); }
+    if (state.local) { const i = state.jobs.findIndex((j) => j.id === id); const row = { id, ...data };
+      i >= 0 ? (state.jobs[i] = row) : state.jobs.push(row); persistLocal(); renderAll(); return; }
+    await state.db.collection("jobs").doc(id).set(data);
+  },
+  async deleteJob(id, quiet = false) {
+    if (!quiet) sheet.push("delete", [{ id }], "jobs");
+    if (state.local) { state.jobs = state.jobs.filter((j) => j.id !== id); persistLocal(); renderAll(); return; }
+    await state.db.collection("jobs").doc(id).delete();
+  },
+  // quiet: تغيير قادم من الشيت نفسه، فلا يُعاد إرساله
+  async saveCandidate(id, data, quiet = false) {
+    if (!quiet) { data = { ...data, updatedAt: Date.now() }; sheet.push("upsert", [{ id, ...data }]); }
+    if (state.local) { const i = state.candidates.findIndex((c) => c.id === id); const row = { id, ...data };
+      i >= 0 ? (state.candidates[i] = row) : state.candidates.push(row); persistLocal(); renderAll(); return; }
+    await state.db.collection("candidates").doc(id).set(data);
+  },
+  async deleteCandidate(id, quiet = false) {
+    if (!quiet) sheet.push("delete", [{ id }]);
+    if (state.local) { state.candidates = state.candidates.filter((c) => c.id !== id); persistLocal(); renderAll(); return; }
+    await state.db.collection("candidates").doc(id).delete();
+  },
+};
+
+// ---------- Google Sheet two-way sync (Apps Script web app) ----------
+// الإرسال: POST لكل حفظ/حذف. السحب: GET دوري يقارن "آخر تعديل" لكل صف ويأخذ الأحدث.
+// hr.sheetSynced = معرفات رآها السحب الأخير في الشيت (اختفاؤها يعني أنها حُذفت من الشيت)
+// hr.sheetDeleted = معرفات حُذفت في التطبيق ولم يتأكد حذفها من الشيت بعد
+// رابط الشيت الافتراضي: كل من يفتح الموقع يتصل به تلقائياً (ويقدر يغيّره أو يمسحه من الإعدادات)
+const DEFAULT_SHEET_URL = "https://script.google.com/macros/s/AKfycbzit_8n2YC4NbUpjsI0lLI9NAQgQ-74lRdaeVH95UTLoC42iRLTMs0HOBcHth-PvArn/exec";
+// ---------- الحسابات: تسجيل الدخول يتحقق منه كود Google Sheet، والبيانات لا تُقرأ بدون جلسة ----------
+const ROLE_AR = { admin: "مدير", hr: "موارد بشرية", viewer: "مشاهد" };
+const auth = {
+  session: null, // { token, user: { username, name, role } }
+  load() { try { this.session = JSON.parse(localStorage.getItem("hr.session") || "null"); } catch { this.session = null; } },
+  save(s) { this.session = s; try { s ? localStorage.setItem("hr.session", JSON.stringify(s)) : localStorage.removeItem("hr.session"); } catch {} },
+  // بدون شيت (نسخة محلية): لا حسابات، وصاحب المتصفح له كل الصلاحيات
+  role() { return !sheet.url() ? "admin" : this.session?.user?.role || "viewer"; },
+};
+auth.load();
+const canEdit = () => auth.role() !== "viewer";
+const isAdmin = () => auth.role() === "admin";
+
+// text/plain: طلب بسيط بلا preflight (لا يدعمه Apps Script)
+async function api(body) {
+  const url = sheet.url();
+  if (!url) throw new Error("لا يوجد رابط Google Sheet.");
+  let d;
+  try {
+    const r = await fetch(url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ ...body, token: auth.session?.token || "" }) });
+    d = await r.json();
+  } catch { throw new Error("تعذّر الاتصال بـ Google Sheet. تأكد أن الكود الجديد منشور بإصدار جديد وأن الوصول Anyone."); }
+  if (!d?.ok) {
+    const e = new Error(d?.error || "حدث خطأ غير متوقع."); e.auth = !!d?.auth;
+    if (e.auth && auth.session) { auth.save(null); showLogin(e.message); }
+    throw e;
+  }
+  return d;
+}
+
+function clearLocalData() {
+  try { [LOCAL_KEY, "hr.job", "hr.sheetSynced", "hr.sheetDeleted", "hr.sheetJobsSynced", "hr.sheetJobsDeleted"].forEach((k) => localStorage.removeItem(k)); } catch {}
+}
+
+const sheet = {
+  pending: 0, lastPush: 0, pulling: false, ready: false, jobsOK: false, lastSync: 0, failed: false, link: "",
+  url() { try { return localStorage.getItem("hr.sheetUrl") ?? DEFAULT_SHEET_URL; } catch { return DEFAULT_SHEET_URL; } },
+  ids(key) { try { return new Set(JSON.parse(localStorage.getItem(key) || "[]")); } catch { return new Set(); } },
+  saveIds(key, set) { try { localStorage.setItem(key, JSON.stringify([...set])); } catch {} },
+  day: (t) => (t ? new Date(t).toLocaleDateString("en-CA") : ""),
+  row(c) {
+    const job = state.jobs.find((j) => j.id === c.jobId);
+    let res = null; try { res = Fuzzy.evaluate(c, jobCfg(job)); } catch {}
+    return { id: c.id, date: new Date(c.createdAt || Date.now()).toISOString().slice(0, 16).replace("T", " "),
+      job: job?.title || "", department: job ? deptOf(job) : "", name: c.name || "", contact: c.contact || "", experience: c.experience ?? "", skill: c.skill ?? "",
+      interview: c.interview ?? "", expected_salary: c.expected_salary ?? "", score: res?.score ?? "", decision: res?.decision ?? "",
+      notes: c.notes || "", hired_at: c.hired ? this.day(c.hiredAt) : "", updated: c.updatedAt || c.createdAt || 0, hired: c.hired ? "نعم" : "لا" };
+  },
+  fromRow(s, prev) {
+    const n = (v) => { const x = Fuzzy.num(v); return x === null || Number.isNaN(x) ? null : x; };
+    const job = state.jobs.find((j) => j.title === String(s.job ?? "").trim());
+    const updated = Number(s.updated) || Date.now();
+    // الشيت يرسل hired حسب التبويب (الموظفين = نعم). بدونه (كود قديم) نُبقي القيمة الحالية
+    const h = String(s.hired ?? "").trim();
+    const hired = h === "" ? !!prev?.hired : /^(نعم|yes|true|1|✓)$/i.test(h);
+    const at = Date.parse(s.hired_at);
+    const hiredAt = !hired ? null : prev?.hiredAt && (!Number.isFinite(at) || this.day(prev.hiredAt) === this.day(at)) ? prev.hiredAt
+      : Number.isFinite(at) ? at : updated;
+    return { hired, hiredAt, jobId: job?.id || prev?.jobId || state.jobId, name: String(s.name ?? "").trim() || "بدون اسم",
+      contact: String(s.contact ?? ""), notes: String(s.notes ?? ""), experience: n(s.experience), skill: n(s.skill),
+      interview: n(s.interview), expected_salary: n(s.expected_salary), createdAt: prev?.createdAt || updated, updatedAt: updated };
+  },
+  jobRow(j) {
+    const c = jobCfg(j);
+    return { id: j.id, title: c.title, department: String(c.department ?? "").trim(), headcount: neededOf(j), budget: c.budget, hire: c.hire,
+      shortlist: c.shortlist, minInterview: c.minInterview, minSkill: c.minSkill, updated: j.updatedAt || j.createdAt || 0 };
+  },
+  jobFromRow(s, prev) {
+    const base = jobCfg(prev), updated = Number(s.updated) || Date.now();
+    const n = (v, d) => { const x = Fuzzy.num(v); return x === null || Number.isNaN(x) ? Number(d) || 0 : x; };
+    const j = { title: String(s.title).trim(), department: String(s.department ?? "").trim(),
+      headcount: Math.max(0, Math.round(n(s.headcount, base.headcount))), budget: Math.max(0, n(s.budget, base.budget)),
+      hire: n(s.hire, base.hire), shortlist: n(s.shortlist, base.shortlist), minInterview: n(s.minInterview, base.minInterview),
+      minSkill: n(s.minSkill, base.minSkill), createdAt: prev?.createdAt || updated, updatedAt: updated };
+    if (!(j.shortlist < j.hire)) { j.hire = base.hire; j.shortlist = base.shortlist; } // حدود غير صالحة من الشيت
+    return j;
+  },
+  // ما يُزامَن: الوظائف (تبويب الوظائف) والأشخاص (تبويبا المرشحون والموظفين)
+  kinds: {
+    jobs: { syncedKey: "hr.sheetJobsSynced", deadKey: "hr.sheetJobsDeleted", list: () => state.jobs,
+      valid: (s) => String(s.title ?? "").trim() !== "",
+      fromRow: (s, prev) => sheet.jobFromRow(s, prev), save: (id, j) => store.saveJob(id, j, true), del: (id) => store.deleteJob(id, true),
+      canDelete: (j) => !state.candidates.some((c) => c.jobId === j.id),
+      // الوظيفة الافتراضية لمتصفح جديد لا تُرسل للشيت إلا إذا أُضيف عليها مرشحون
+      skip: (j) => j.placeholder && !state.candidates.some((c) => c.jobId === j.id) },
+    people: { syncedKey: "hr.sheetSynced", deadKey: "hr.sheetDeleted", list: () => state.candidates, valid: () => true,
+      fromRow: (s, prev) => sheet.fromRow(s, prev), save: (id, c) => store.saveCandidate(id, c, true), del: (id) => store.deleteCandidate(id, true),
+      canDelete: () => true, skip: () => false },
+  },
+  // نقرأ الرد لنعرف إن فشل الحفظ في الشيت فعلاً
+  push(action, rows, kind = "people") {
+    if (!this.url() || !rows.length || !canEdit()) return Promise.resolve(false);
+    if (kind === "jobs" && !this.jobsOK) return Promise.resolve(false); // كود الشيت القديم لا يعرف الوظائف
+    if (action === "delete") { const k = this.kinds[kind], dead = this.ids(k.deadKey); rows.forEach((r) => dead.add(r.id)); this.saveIds(k.deadKey, dead); }
+    const payload = { kind, action, rows: action === "delete" ? rows.map((r) => ({ id: r.id }))
+      : rows.map((r) => (kind === "jobs" ? this.jobRow(r) : this.row(r))) };
+    this.pending++; this.lastPush = Date.now();
+    return api(payload).then(() => true)
+      .catch((e) => { if (!e.auth) toast("لم يُحفظ التعديل في Google Sheet: " + e.message); return false; })
+      .finally(() => { this.pending--; this.lastPush = Date.now(); });
+  },
+  // يقارن "آخر تعديل" لكل صف ويأخذ الأحدث. synced = معرفات رآها السحب الأخير (اختفاؤها يعني أنها حُذفت من الشيت)
+  async syncKind(kind, rows) {
+    const k = this.kinds[kind], synced = this.ids(k.syncedKey), dead = this.ids(k.deadKey);
+    const seen = new Set(), toPush = [], toDelete = [], changedIds = [];
+    const edit = canEdit(); // المشاهد لا يرسل شيئاً: الشيت هو المرجع دائماً
+    for (const s of rows) {
+      const id = String(s.id ?? "").trim(); if (!id || seen.has(id) || !k.valid(s)) continue;
+      seen.add(id);
+      if (dead.has(id)) { toDelete.push({ id }); continue; }
+      const mine = k.list().find((x) => x.id === id);
+      const sUpd = Number(s.updated) || 0, mUpd = mine ? mine.updatedAt || mine.createdAt || 0 : -1;
+      if (mine && mUpd > sUpd && edit) { toPush.push(mine); continue; }
+      if (mine && mUpd === sUpd) continue;
+      const obj = k.fromRow(s, mine);
+      await k.save(id, obj); changedIds.push(id);
+      toPush.push({ id, ...obj }); // تحديث الأعمدة المحسوبة في الشيت
+    }
+    for (const x of [...k.list()]) {
+      if (seen.has(x.id) || k.skip(x)) continue;
+      if (!edit || (synced.has(x.id) && k.canDelete(x))) { await k.del(x.id); changedIds.push(x.id); } // حُذف من الشيت
+      else toPush.push(x); // لم يصل الشيت بعد (أو وظيفة عليها مرشحون فتُعاد)
+    }
+    [...dead].forEach((id) => { if (!seen.has(id)) dead.delete(id); });
+    this.saveIds(k.deadKey, dead);
+    this.saveIds(k.syncedKey, new Set([...seen].filter((id) => !dead.has(id))));
+    if (toDelete.length) this.push("delete", toDelete, kind);
+    if (toPush.length) this.push("upsert", toPush, kind);
+    return changedIds;
+  },
+  async pull(manual = false) {
+    const url = this.url();
+    if (!url || !this.ready || this.pulling) return false;
+    if (!manual && (this.pending || Date.now() - this.lastPush < 4000)) return false; // ننتظر وصول آخر إرسال
+    this.pulling = true;
+    try {
+      const data = await api({ action: "list" });
+      if (!Array.isArray(data.rows)) throw new Error("bad");
+      // المدير غيّر صلاحيتك: تُطبَّق فوراً
+      if (data.user && auth.session && JSON.stringify(data.user) !== JSON.stringify(auth.session.user)) {
+        auth.save({ ...auth.session, user: data.user }); applyRole();
+      }
+      this.link = data.sheetUrl || "";
+      let changed = 0, jobIds = [];
+      this.jobsOK = Array.isArray(data.jobs);
+      if (this.jobsOK) {
+        jobIds = await this.syncKind("jobs", data.jobs);
+        changed += jobIds.length;
+        if (data.jobs.length) for (const j of state.jobs.filter((x) => this.kinds.jobs.skip(x))) await store.deleteJob(j.id, true);
+      }
+      // الشخص نفسه في التبويبين (نسخ بدل قص): نأخذ الأحدث
+      const people = new Map();
+      data.rows.forEach((r) => { const id = String(r.id ?? "").trim(), o = people.get(id); if (!o || Number(r.updated) > Number(o.updated)) people.set(id, r); });
+      const ids = await this.syncKind("people", [...people.values()]);
+      changed += ids.length;
+      // وظيفة تغيّرت من الشيت: درجات مرشحيها وقسمهم يتغيرون
+      const affected = state.candidates.filter((c) => jobIds.includes(c.jobId) && !ids.includes(c.id));
+      if (affected.length) this.push("upsert", affected);
+      if (changed && !manual) toast(`تم تحديث ${changed} من Google Sheet`);
+      this.failed = false; this.lastSync = Date.now();
+      return { changed };
+    } catch (e) {
+      this.failed = true;
+      if (manual && !e.auth) toast("تعذّرت القراءة من Google Sheet. تأكد أن الرابط صحيح وأن الكود الجديد منشور.");
+      return false;
+    } finally { this.pulling = false; renderSyncStatus(); }
+  },
+  start() {
+    if (this.ready) return;
+    this.ready = true; this.pull();
+    setInterval(() => this.pull(), 20000);
+    window.addEventListener("focus", () => this.pull());
+  },
+};
+function renderSyncStatus() {
+  const el = $("dSync"); if (!el) return;
+  const url = sheet.url();
+  el.className = "sync " + (!url ? "" : sheet.failed ? "bad" : sheet.lastSync ? "ok" : "");
+  el.textContent = !url ? "غير مربوط بـ Google Sheet (اربطه من إعدادات الوظيفة)"
+    : sheet.failed ? "تعذّر الاتصال بـ Google Sheet"
+    : sheet.lastSync ? `مربوط بـ Google Sheet · آخر مزامنة ${new Date(sheet.lastSync).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`
+    : "جارٍ الاتصال بـ Google Sheet…";
+  $("dSheetLink").hidden = !sheet.link; if (sheet.link) $("dSheetLink").href = sheet.link;
+  $("dSyncBtn").hidden = !url;
+}
+const newId = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+function dbErrorText(e) {
+  if (e?.code === "invalid_argument") return "لا تملك صلاحية التعديل على هذه البيانات.";
+  if (e?.code === "quota_exceeded") return "امتلأت سعة قاعدة البيانات. احذف مرشحين قدامى ثم أعد المحاولة.";
+  return "تعذّر الحفظ. تحقق من الاتصال ثم أعد المحاولة.";
+}
+
+function cleanCandidate(f) {
+  const n = (v) => { const x = Fuzzy.num(v); return x === null || Number.isNaN(x) ? null : x; };
+  return { jobId: state.jobId, name: f.name, contact: f.contact || "", notes: f.notes || "",
+    experience: n(f.experience), skill: n(f.skill), interview: n(f.interview), expected_salary: n(f.expected_salary) };
+}
+
+// ---------- events ----------
+["cName", "cContact", "cExp", "cSal", "cSkill", "cInt", "cNotes"].forEach((id) => $(id).addEventListener("input", renderPreview));
+
+$("candForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const err = $("cErr"); err.hidden = true;
+  if (!state.jobId) { err.textContent = "أنشئ وظيفة أولاً."; err.hidden = false; return; }
+  const f = readForm();
+  if (!f.name) { err.textContent = "اكتب اسم المرشح."; err.hidden = false; return; }
+  try { Fuzzy.evaluate(f, jobCfg(currentJob())); } catch (x) { err.textContent = x.message; err.hidden = false; return; }
+  const editing = state.editingId;
+  const prev = editing && state.candidates.find((c) => c.id === editing);
+  const data = { ...cleanCandidate(f), createdAt: prev?.createdAt || Date.now(), jobId: prev?.jobId || state.jobId,
+    hired: !!prev?.hired, hiredAt: prev?.hiredAt || null };
+  $("cSubmit").disabled = true;
+  try {
+    await store.saveCandidate(editing || newId("c"), data);
+    toast(editing ? "تم حفظ التعديلات" : `تمت إضافة ${f.name}`);
+    resetForm();
+  } catch (x) { err.textContent = dbErrorText(x); err.hidden = false; }
+  finally { $("cSubmit").disabled = state.readOnly; }
+});
+
+function resetForm() {
+  state.editingId = null;
+  $("candForm").reset(); $("oSkill").textContent = $("cSkill").value; $("oInt").textContent = $("cInt").value;
+  $("formTitle").textContent = "تقديم مرشح جديد"; $("cSubmit").textContent = "حفظ المرشح"; $("cancelEdit").hidden = true;
+  renderPreview();
+}
+$("cancelEdit").addEventListener("click", resetForm);
+
+function startEdit(id) {
+  const c = state.candidates.find((x) => x.id === id); if (!c) return;
+  state.editingId = id;
+  $("cName").value = c.name || ""; $("cContact").value = c.contact || ""; $("cExp").value = c.experience ?? "";
+  $("cSal").value = c.expected_salary ?? ""; $("cSkill").value = c.skill ?? 5; $("cInt").value = c.interview ?? 5; $("cNotes").value = c.notes || "";
+  $("formTitle").textContent = "تعديل بيانات المرشح"; $("cSubmit").textContent = "حفظ التعديلات"; $("cancelEdit").hidden = false;
+  renderPreview(); $("cName").focus(); $("formTitle").scrollIntoView({ block: "nearest" });
+}
+
+$("tbody").addEventListener("click", async (e) => {
+  const edit = e.target.closest("[data-edit]"), del = e.target.closest("[data-del]"), conf = e.target.closest("[data-confirm]");
+  if (edit) return startEdit(edit.dataset.edit);
+  const hire = e.target.closest("[data-hire]");
+  if (hire) {
+    const c = state.candidates.find((x) => x.id === hire.dataset.hire); if (!c) return;
+    const { id, ...rest } = c; const hired = !c.hired;
+    hire.disabled = true;
+    try {
+      await store.saveCandidate(id, { ...rest, hired, hiredAt: hired ? Date.now() : null });
+      const job = state.jobs.find((j) => j.id === c.jobId);
+      const count = state.candidates.filter((x) => x.jobId === c.jobId && x.hired).length;
+      toast(hired ? `تم تعيين ${c.name}${count > neededOf(job) ? " (تجاوز العدد المطلوب)" : ""}` : `أُلغي تعيين ${c.name}`);
+    } catch (x) { toast(dbErrorText(x)); hire.disabled = false; }
+    return;
+  }
+  if (del) {
+    const id = del.dataset.del;
+    $("act-" + id).innerHTML = `<span>حذف هذا المرشح نهائياً؟</span>
+      <button class="btn danger" type="button" data-confirm="${esc(id)}">نعم، احذف</button>
+      <button class="btn" type="button" data-cancel="1">تراجع</button>`;
+    return;
+  }
+  if (conf) {
+    try { await store.deleteCandidate(conf.dataset.confirm); toast("تم حذف المرشح"); if (state.editingId === conf.dataset.confirm) resetForm(); }
+    catch (x) { toast(dbErrorText(x)); }
+    return;
+  }
+  if (e.target.closest("[data-cancel]")) return renderList();
+  const row = e.target.closest("tr.cand");
+  if (row) { state.expandedId = state.expandedId === row.dataset.id ? null : row.dataset.id; renderList(); }
+});
+$("tbody").addEventListener("keydown", (e) => {
+  const row = e.target.closest("tr.cand");
+  if (row && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); row.click(); }
+});
+
+$("search").addEventListener("input", (e) => { state.search = e.target.value; renderList(); });
+$("filterSeg").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-f]"); if (!b) return;
+  state.filter = b.dataset.f;
+  $("filterSeg").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+  renderList();
+});
+
+$("jobSelect").addEventListener("change", (e) => {
+  state.jobId = e.target.value || null; state.expandedId = null;
+  try { localStorage.setItem("hr.job", state.jobId || ""); } catch {}
+  fillJobForm(currentJob()); renderAll();
+});
+
+$("newJobBtn").addEventListener("click", () => {
+  state.creatingJob = true;
+  $("settingsPanel").open = true;
+  fillJobForm(null); $("jTitle").value = ""; $("jSave").textContent = "إنشاء الوظيفة"; $("jTitle").focus();
+});
+
+$("jobForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const err = $("jErr"); err.hidden = true;
+  const v = (id) => Number($(id).value);
+  const data = { title: $("jTitle").value.trim(), budget: v("jBudget") || 0, hire: v("jHire"), shortlist: v("jShort"),
+    minInterview: v("jMinInt"), minSkill: v("jMinSkill"), department: $("jDept").value.trim(),
+    headcount: Math.max(0, Math.round(v("jHead") || 0)) };
+  if (!data.title) { err.textContent = "اكتب المسمى الوظيفي."; err.hidden = false; return; }
+  if (!(data.shortlist < data.hire)) { err.textContent = "حد القائمة المختصرة يجب أن يكون أقل من حد التوظيف."; err.hidden = false; return; }
+  const creating = state.creatingJob || !state.jobId;
+  const id = creating ? newId("j") : state.jobId;
+  const prev = currentJob();
+  data.createdAt = creating ? Date.now() : prev?.createdAt || Date.now();
+  try {
+    await store.saveJob(id, data);
+    state.creatingJob = false; $("jSave").textContent = "حفظ الإعدادات";
+    state.jobId = id; try { localStorage.setItem("hr.job", id); } catch {}
+    if (!creating) sheet.push("upsert", state.candidates.filter((c) => c.jobId === id)); // الدرجات تتغير مع الإعدادات
+    toast(creating ? "تم إنشاء الوظيفة" : "تم حفظ الإعدادات، وأُعيد ترتيب المرشحين");
+    renderAll();
+  } catch (x) { err.textContent = dbErrorText(x); err.hidden = false; }
+});
+
+$("jDelete").addEventListener("click", async () => {
+  const j = currentJob(); if (!j) return;
+  const count = state.candidates.filter((c) => c.jobId === j.id).length;
+  const err = $("jErr");
+  if (count) { err.textContent = `لا يمكن حذف وظيفة عليها ${count} مرشح. احذف المرشحين أولاً.`; err.hidden = false; return; }
+  if ($("jDelete").dataset.armed !== "1") { $("jDelete").dataset.armed = "1"; $("jDelete").textContent = "اضغط مرة أخرى للتأكيد"; return; }
+  $("jDelete").dataset.armed = ""; $("jDelete").textContent = "حذف الوظيفة";
+  try { await store.deleteJob(j.id); toast("تم حذف الوظيفة"); } catch (x) { toast(dbErrorText(x)); }
+});
+
+// ---------- Excel import / export ----------
+const COLS = {
+  name: ["name", "الاسم", "اسم المرشح"], contact: ["contact", "email", "phone", "البريد", "الجوال", "التواصل"],
+  experience: ["experience", "الخبرة", "سنوات الخبرة", "الخبرة (سنوات)"], skill: ["skill", "المهارة", "المهارة التقنية", "المهارة (0-10)"],
+  interview: ["interview", "المقابلة", "أداء المقابلة", "المقابلة (0-10)"], expected_salary: ["expected_salary", "salary", "الراتب", "الراتب المتوقع"],
+  notes: ["notes", "ملاحظات"],
+};
+function mapRow(row) {
+  const keys = Object.keys(row); const out = {};
+  for (const [k, names] of Object.entries(COLS)) {
+    const hit = keys.find((h) => names.includes(String(h).trim().toLowerCase()) || names.includes(String(h).trim()));
+    if (hit !== undefined) out[k] = row[hit];
+  }
+  return out;
+}
+
+$("fileInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0]; e.target.value = "";
+  if (!file) return;
+  const box = $("importBox"); box.hidden = false;
+  if (!window.XLSX) { box.innerHTML = `<span class="err">تعذّر تحميل قارئ ملفات Excel. أعد تحميل الصفحة.</span>`; return; }
+  if (!state.jobId) { box.innerHTML = `<span class="err">أنشئ وظيفة أولاً.</span>`; return; }
+  try {
+    const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
+    const good = [], bad = [];
+    rows.forEach((r, i) => {
+      const m = mapRow(r);
+      if (!m.name && !m.experience && !m.skill && !m.interview) return;
+      try { Fuzzy.evaluate(m, jobCfg(currentJob())); good.push(m); }
+      catch (x) { bad.push(`صف ${i + 2}${m.name ? " (" + m.name + ")" : ""}: ${x.message}`); }
+    });
+    state.pendingImport = good;
+    box.innerHTML = `<b>${esc(file.name)}</b>
+      <span>جاهز للإضافة: <b class="num">${good.length}</b> مرشح${bad.length ? ` · سيتم تخطي <b class="num">${bad.length}</b>` : ""}</span>
+      ${bad.length ? `<ul class="err" style="margin:0">${bad.slice(0, 8).map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}
+      ${good.length ? "" : `<span class="muted">الأعمدة المطلوبة: name، experience، skill، interview (و expected_salary اختياري). نزّل النموذج لترى الشكل.</span>`}
+      <div class="actions">${good.length ? `<button class="btn primary" type="button" id="doImport">إضافة ${good.length} إلى «${esc(currentJob()?.title)}»</button>` : ""}
+      <button class="btn" type="button" id="closeImport">إغلاق</button></div>`;
+  } catch { box.innerHTML = `<span class="err">تعذّرت قراءة الملف. تأكد أنه ملف Excel أو CSV صالح.</span> <button class="btn" type="button" id="closeImport">إغلاق</button>`; }
+});
+$("importBox").addEventListener("click", async (e) => {
+  if (e.target.id === "closeImport") { $("importBox").hidden = true; state.pendingImport = null; }
+  if (e.target.id === "doImport") {
+    const rows = state.pendingImport || []; e.target.disabled = true;
+    let done = 0;
+    try {
+      for (const r of rows) {
+        await store.saveCandidate(newId("c"), { ...cleanCandidate({ ...r, name: String(r.name || "").trim() || "بدون اسم" }), createdAt: Date.now() + done });
+        done++; e.target.textContent = `جارٍ الإضافة… ${done}/${rows.length}`;
+      }
+      toast(`تمت إضافة ${done} مرشح`); $("importBox").hidden = true; state.pendingImport = null;
+    } catch (x) { toast(`أُضيف ${done} فقط. ${dbErrorText(x)}`); e.target.disabled = false; }
+  }
+});
+
+async function saveFile(filename, wb) {
+  if (!window.XLSX) return toast("تعذّر تحميل مكتبة Excel. أعد تحميل الصفحة.");
+  wb.Workbook = { Views: [{ RTL: true }] };
+  // خارج Claude (موقع مستقل) يعمل التنزيل العادي من المتصفح
+  if (!window.claude) return XLSX.writeFile(wb, filename);
+  if (!state.downloads) return toast("التنزيل غير متاح في هذا العرض.");
+  const data = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  try { await state.downloads.save({ filename, data: new Blob([data]) }); }
+  catch (x) { if (x?.code !== "declined") toast("لم يكتمل التنزيل."); }
+}
+
+$("exportBtn").addEventListener("click", () => {
+  const job = jobCfg(currentJob()); const rows = ranked();
+  if (!rows.length) return toast("لا يوجد مرشحون لتصديرهم.");
+  const table = rows.map((r, i) => ({
+    "الترتيب": i + 1, "الاسم": r.c.name, "التواصل": r.c.contact || "", "الخبرة (سنوات)": r.c.experience, "المهارة (0-10)": r.c.skill,
+    "المقابلة (0-10)": r.c.interview, "الراتب المتوقع": r.c.expected_salary ?? "", "نسبة الراتب للميزانية": r.res?.ratio ? +r.res.ratio.toFixed(2) : "",
+    "درجة القبول": r.res?.score ?? "", "القرار": r.res?.decision ?? r.error,
+    "سبب القرار": r.res ? (r.res.failed.length ? ["لم يحقق الحد الأدنى في: " + r.res.failed.join("، ")] : []).concat(r.res.reasons.map((x) => `${x.text} ← قبول ${x.out} (قوة ${pct(x.strength)})`)).join(" ؛ ") : "",
+    "ملاحظات": r.c.notes || "",
+  }));
+  const ok = rows.filter((r) => r.res);
+  const summary = [["البند", "القيمة"], ["الوظيفة", job.title], ["الميزانية", job.budget], ["عدد المرشحين", rows.length],
+    ["توصية بالتوظيف", ok.filter((r) => r.res.tier === "hire").length], ["قائمة مختصرة", ok.filter((r) => r.res.tier === "shortlist").length],
+    ["رفض", ok.filter((r) => r.res.tier === "reject").length],
+    ["متوسط الدرجة", ok.length ? +(ok.reduce((s, r) => s + r.res.score, 0) / ok.length).toFixed(1) : ""],
+    ["أعلى درجة", ok.length ? Math.max(...ok.map((r) => r.res.score)) : ""], ["تاريخ التقرير", new Date().toISOString().slice(0, 16).replace("T", " ")]];
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(table); ws["!cols"] = Object.keys(table[0]).map((k) => ({ wch: k === "سبب القرار" ? 70 : 16 }));
+  XLSX.utils.book_append_sheet(wb, ws, "النتائج");
+  const ws2 = XLSX.utils.aoa_to_sheet(summary); ws2["!cols"] = [{ wch: 18 }, { wch: 24 }];
+  XLSX.utils.book_append_sheet(wb, ws2, "الملخص");
+  saveFile(`تقرير المرشحين - ${job.title}.xlsx`, wb);
+});
+
+$("templateBtn").addEventListener("click", () => {
+  if (!window.XLSX) return toast("تعذّر تحميل مكتبة Excel. أعد تحميل الصفحة.");
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ["name", "contact", "experience", "skill", "interview", "expected_salary", "notes"],
+    ["مرشح أ", "", 3, 8, 7, 11000, ""], ["مرشح ب", "", 7, 6, 8, 15500, ""],
+  ]), "المرشحون");
+  saveFile("نموذج المرشحين.xlsx", wb);
+});
+
+$("sheetUrl").value = sheet.url();
+$("sheetSave").addEventListener("click", () => {
+  const url = $("sheetUrl").value.trim();
+  if (url && !/^https:\/\/script\.google(usercontent)?\.com\//.test(url)) return toast("الرابط يجب أن يبدأ بـ https://script.google.com/");
+  // شيت مختلف: سجل المزامنة السابق لا ينطبق عليه
+  if (url !== sheet.url()) try { ["hr.sheetSynced", "hr.sheetDeleted", "hr.sheetJobsSynced", "hr.sheetJobsDeleted"].forEach((k) => localStorage.removeItem(k)); } catch {}
+  try { localStorage.setItem("hr.sheetUrl", url); } catch {}
+  Object.assign(sheet, { link: "", lastSync: 0, failed: false, jobsOK: false }); renderSyncStatus();
+  toast(url ? "تم حفظ الرابط. جارٍ المزامنة مع الشيت…" : "تم إيقاف المزامنة مع الشيت");
+  if (url) sheet.pull(true).then((r) => r && toast("تمت المزامنة مع Google Sheet"));
+});
+$("sheetSyncAll").addEventListener("click", async () => {
+  if (!sheet.url()) return toast("الصق رابط Google Sheet واحفظه أولاً.");
+  const r = await sheet.pull(true);
+  if (r) toast(r.changed ? `تمت المزامنة: ${r.changed} تغيير من الشيت` : "تمت المزامنة مع Google Sheet");
+});
+
+// ---------- dashboard ----------
+// الاحتياج مكتمل عندما يصل عدد المعيّنين إلى العدد المطلوب للوظيفة
+function dashData() {
+  return state.jobs.map((j) => {
+    const cfg = jobCfg(j), needed = neededOf(j);
+    const cands = state.candidates.filter((c) => c.jobId === j.id).map((c) => {
+      let res = null; try { res = Fuzzy.evaluate(c, cfg); } catch {}
+      return { c, res };
+    });
+    const emps = cands.filter((x) => x.c.hired);
+    const pool = cands.filter((x) => !x.c.hired);
+    const tiers = { hire: 0, shortlist: 0, reject: 0 };
+    pool.forEach((x) => { if (x.res) tiers[x.res.tier]++; });
+    const hired = emps.length;
+    return { j, dept: deptOf(j), needed, hired, filled: Math.min(hired, needed), remaining: Math.max(0, needed - hired),
+      extra: Math.max(0, hired - needed), done: hired >= needed, tiers, ready: tiers.hire, total: cands.length, emps };
+  });
+}
+
+const tips = [];
+const tipAttr = (title, rows) => { tips.push({ title, rows }); return `data-ti="${tips.length - 1}"`; };
+function showTip(el, x, y) {
+  const d = tips[el.dataset.ti]; if (!d) return;
+  const t = $("tip"); t.replaceChildren();
+  const h = document.createElement("div"); h.className = "t"; h.textContent = d.title; t.append(h);
+  d.rows.forEach(([label, value, color]) => {
+    const r = document.createElement("div"); r.className = "r";
+    const s = document.createElement("span");
+    if (color) { const k = document.createElement("i"); k.className = "k"; k.style.background = color; s.append(k); }
+    s.append(label);
+    const b = document.createElement("b"); b.textContent = value;
+    r.append(s, b); t.append(r);
+  });
+  t.hidden = false;
+  const w = t.offsetWidth, hh = t.offsetHeight;
+  t.style.left = Math.max(8, Math.min(innerWidth - w - 8, x - w / 2)) + "px";
+  t.style.top = (y - hh - 14 < 8 ? y + 18 : y - hh - 14) + "px";
+}
+const hideTip = () => ($("tip").hidden = true);
+
+function groupDepts(rows) {
+  const m = new Map();
+  rows.forEach((r) => {
+    const g = m.get(r.dept) || { dept: r.dept, needed: 0, hired: 0, filled: 0, remaining: 0, extra: 0, jobs: 0, done: 0, ready: 0,
+      total: 0, tiers: { hire: 0, shortlist: 0, reject: 0 } };
+    g.needed += r.needed; g.hired += r.hired; g.filled += r.filled; g.remaining += r.remaining; g.extra += r.extra;
+    g.jobs++; g.done += r.done ? 1 : 0; g.ready += r.ready; g.total += r.total;
+    Object.keys(g.tiers).forEach((k) => (g.tiers[k] += r.tiers[k]));
+    m.set(r.dept, g);
+  });
+  return [...m.values()].sort((a, b) => b.needed - a.needed || a.dept.localeCompare(b.dept, "ar"));
+}
+
+function renderDash() {
+  if (state.view !== "dash") return;
+  hideTip(); tips.length = 0;
+  const all = dashData();
+  const depts = [...new Set(all.map((r) => r.dept))].sort((a, b) => a.localeCompare(b, "ar"));
+  if (!depts.includes(state.dDept)) state.dDept = "";
+  $("dDept").innerHTML = `<option value="">كل الأقسام (${depts.length})</option>` + depts.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
+  $("dDept").value = state.dDept;
+  $("dStatus").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.s === state.dStatus));
+  $("dReset").hidden = !state.dDept && state.dStatus === "all";
+
+  const inDept = all.filter((r) => !state.dDept || r.dept === state.dDept);
+  const rows = inDept.filter((r) => state.dStatus === "all" || (state.dStatus === "done") === r.done);
+  const groups = groupDepts(rows);
+  const sum = (k) => rows.reduce((s, r) => s + r[k], 0);
+  const needed = sum("needed"), filled = sum("filled"), hired = sum("hired"), doneJobs = rows.filter((r) => r.done).length;
+  const fill = needed ? filled / needed : rows.length ? 1 : 0;
+
+  // KPIs
+  $("dKpis").innerHTML = `
+    <div class="stat"><b>${groups.length}</b><span>قسم</span></div>
+    <div class="stat"><b>${rows.length}</b><span>وظيفة</span><small>${doneJobs} مكتملة · ${rows.length - doneJobs} غير مكتملة</small></div>
+    <div class="stat"><b>${hired}<small class="muted" style="display:inline;font-size:.9rem"> / ${needed}</small></b><span>موظف معيّن من الاحتياج</span></div>
+    <div class="stat ${fill >= 1 ? "hire" : "short"}"><b>${pct(fill)}</b><span>نسبة اكتمال الاحتياج</span><div class="meter"><i style="--w:${Math.min(100, fill * 100)}%"></i></div></div>
+    <div class="stat"><b>${sum("remaining")}</b><span>شاغر متبقٍ</span><small>${sum("ready")} مرشح جاهز للتعيين</small></div>`;
+
+  // اكتمال الاحتياج حسب القسم
+  const max1 = Math.max(1, ...groups.map((g) => g.needed + g.extra));
+  const w = (v, max) => (v > 0 ? `<i class="CLS" style="width:calc(${(v / max) * 100}% - 2px)"></i>` : "");
+  const seg = (cls, v, max) => w(v, max).replace("CLS", cls);
+  $("dDeptChart").innerHTML = groups.length ? groups.map((g) => `
+    <div class="hrow ${state.dDept === g.dept ? "sel" : ""}" tabindex="0" role="button" data-dept="${esc(g.dept)}"
+      aria-label="${esc(g.dept)}: تم تعيين ${g.hired} من ${g.needed}" ${tipAttr(g.dept, [
+        ["تم تعيينهم", String(g.hired), "var(--accent)"], ["العدد المطلوب", String(g.needed)], ["المتبقي", String(g.remaining)],
+        ["جاهز للتعيين", String(g.ready), "var(--hire)"], ["وظائف مكتملة", `${g.done} من ${g.jobs}`]])}>
+      <span class="lbl">${esc(g.dept)}</span>
+      <div class="track">${seg("f-fill", g.filled, max1)}${seg("f-extra", g.extra, max1)}${seg("f-gap", g.remaining, max1)}</div>
+      <span class="hval"><b>${g.hired}</b> / ${g.needed} · ${g.remaining ? `<span class="warn">ينقص ${g.remaining}</span>` : `<span class="ok">✓ مكتمل</span>`}</span>
+    </div>`).join("") : `<p class="empty">لا توجد وظائف مطابقة.</p>`;
+
+  // حالة الوظائف (مكتمل / غير مكتمل) — على الوظائف بعد تصفية القسم فقط، حتى يبقى الجزآن ظاهرين
+  const dDone = inDept.filter((r) => r.done).length, dOpen = inDept.length - dDone, tot = inDept.length;
+  const R = 62, C = 2 * Math.PI * R, gap = dDone && dOpen ? 2 : 0;
+  const arc = (n, off, color, key, label) => {
+    if (!n) return "";
+    const len = (n / tot) * C - gap;
+    return `<circle r="${R}" cx="85" cy="85" fill="none" stroke="${color}" stroke-width="18" tabindex="0" role="button"
+      stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-off}" data-status="${key}"
+      aria-label="${label}: ${n}" ${tipAttr(label, [["عدد الوظائف", String(n), color], ["النسبة", pct(n / tot)]])}/>`;
+  };
+  const donePct = tot ? Math.round((dDone / tot) * 100) : 0;
+  $("dDonut").innerHTML = `
+    <svg viewBox="0 0 170 170" role="img" aria-label="${dDone} وظيفة مكتملة من ${tot}">
+      <g transform="rotate(-90 85 85)">
+        <circle r="${R}" cx="85" cy="85" fill="none" stroke="var(--line)" stroke-width="18" opacity="${tot ? 0 : 1}"/>
+        ${arc(dDone, 0, "var(--hire)", "done", "✓ مكتمل")}${arc(dOpen, (dDone / Math.max(tot, 1)) * C, "var(--short)", "open", "! غير مكتمل")}
+      </g>
+      <text x="85" y="84" text-anchor="middle" font-size="28" font-weight="700" fill="var(--ink)" font-family="var(--font-display)">${donePct}%</text>
+      <text x="85" y="106" text-anchor="middle" font-size="12" fill="var(--muted)">وظائف مكتملة</text>
+    </svg>
+    <div class="dlegend">
+      <button type="button" data-status="done" aria-pressed="${state.dStatus === "done"}"><span class="ok">✓</span><span>مكتمل الاحتياج</span><b>${dDone}</b></button>
+      <button type="button" data-status="open" aria-pressed="${state.dStatus === "open"}"><span class="warn">!</span><span>غير مكتمل</span><b>${dOpen}</b></button>
+    </div>`;
+
+  // المرشحون والموظفون حسب القسم
+  const tot2 = (g) => g.hired + g.tiers.hire + g.tiers.shortlist + g.tiers.reject;
+  const max2 = Math.max(1, ...groups.map(tot2));
+  const cseg = (cls, v, g, label, color) => v > 0
+    ? `<i class="${cls}" style="width:calc(${(v / max2) * 100}% - 2px)" ${tipAttr(g.dept + " · " + label, [[label, String(v), color], ["من إجمالي القسم", pct(v / tot2(g))]])}></i>` : "";
+  $("dCandChart").innerHTML = groups.some((g) => tot2(g)) ? groups.map((g) => `
+    <div class="hrow ${state.dDept === g.dept ? "sel" : ""}" tabindex="0" role="button" data-dept="${esc(g.dept)}"
+      aria-label="${esc(g.dept)}: ${g.hired} موظف، ${g.tiers.hire} توصية، ${g.tiers.shortlist} مختصرة، ${g.tiers.reject} رفض">
+      <span class="lbl">${esc(g.dept)}</span>
+      <div class="track">${cseg("c-emp", g.hired, g, "موظف", "var(--accent)")}${cseg("c-hire", g.tiers.hire, g, "توصية بالتوظيف", "var(--hire)")}${cseg("c-short", g.tiers.shortlist, g, "قائمة مختصرة", "var(--short)")}${cseg("c-rej", g.tiers.reject, g, "رفض", "var(--rej)")}</div>
+      <span class="hval"><b>${tot2(g)}</b> شخص</span>
+    </div>`).join("") : `<p class="empty">لا يوجد مرشحون في الأقسام المحددة.</p>`;
+
+  // جدول الوظائف
+  $("dJobs").innerHTML = rows.length ? rows
+    .sort((a, b) => a.done - b.done || b.remaining - a.remaining || a.dept.localeCompare(b.dept, "ar"))
+    .map((r) => {
+      const p = r.needed ? r.filled / r.needed : 1;
+      return `<tr class="job" tabindex="0" data-job="${esc(r.j.id)}">
+        <td><b>${esc(r.j.title)}</b></td><td>${esc(r.dept)}</td>
+        <td class="num">${r.needed}</td><td class="num">${r.hired}</td><td class="num">${r.remaining}</td><td class="num">${r.ready}</td>
+        <td><div class="bar"><i style="--w:${p * 100}%"></i><b>${pct(p)}</b></div></td>
+        <td>${r.done ? `<span class="pill done">✓ مكتمل</span>` : `<span class="pill open">! غير مكتمل</span>`}</td></tr>`;
+    }).join("") : `<tr><td colspan="8" class="empty">لا توجد وظائف مطابقة.</td></tr>`;
+
+  // جدول الموظفين
+  const q = state.dEmpSearch.trim();
+  const emps = rows.flatMap((r) => r.emps.map((e) => ({ ...e, job: r.j, dept: r.dept })))
+    .filter((e) => !q || (e.c.name || "").includes(q))
+    .sort((a, b) => (b.c.hiredAt || 0) - (a.c.hiredAt || 0));
+  $("dEmps").innerHTML = emps.length ? emps.map((e) => `<tr>
+      <td class="name"><b>${esc(e.c.name || "بدون اسم")}</b>${e.c.contact ? `<small dir="ltr">${esc(e.c.contact)}</small>` : ""}</td>
+      <td>${esc(e.job.title)}</td><td>${esc(e.dept)}</td><td class="num">${e.res ? e.res.score : "–"}</td>
+      <td class="num">${e.c.hiredAt ? new Date(e.c.hiredAt).toLocaleDateString("en-CA") : "–"}</td></tr>`).join("")
+    : `<tr><td colspan="5" class="empty">${q ? "لا توجد نتائج مطابقة." : "لا يوجد موظفون بعد. افتح مرشحاً في صفحة التوظيف واضغط «تعيين كموظف»."}</td></tr>`;
+}
+
+function setView(v) {
+  if (v === "users" && !(isAdmin() && sheet.url())) v = "dash";
+  if (v === "hire" && !canEdit()) v = "dash";
+  state.view = v; try { localStorage.setItem("hr.view", v); } catch {}
+  $("viewSeg").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.v === v));
+  const hire = v === "hire", dash = v === "dash";
+  ["settingsPanel", "statsBar", "mainView", "jobBar"].forEach((id) => ($(id).hidden = !hire));
+  $("dash").hidden = !dash;
+  $("usersView").hidden = v !== "users";
+  hideTip(); renderDash();
+  if (dash) { renderSyncStatus(); sheet.pull(); }
+  if (v === "users") loadUsers();
+}
+$("viewSeg").addEventListener("click", (e) => { const b = e.target.closest("button[data-v]"); if (b) setView(b.dataset.v); });
+$("dDept").addEventListener("change", (e) => { state.dDept = e.target.value; renderDash(); });
+$("dStatus").addEventListener("click", (e) => { const b = e.target.closest("button[data-s]"); if (b) { state.dStatus = b.dataset.s; renderDash(); } });
+$("dSyncBtn").addEventListener("click", async () => {
+  const r = await sheet.pull(true);
+  if (r) toast(r.changed ? `تمت المزامنة: ${r.changed} تغيير من الشيت` : "تمت المزامنة مع Google Sheet");
+});
+$("dReset").addEventListener("click", () => { state.dDept = ""; state.dStatus = "all"; renderDash(); });
+$("dEmpSearch").addEventListener("input", (e) => { state.dEmpSearch = e.target.value; renderDash(); });
+$("dash").addEventListener("click", (e) => {
+  const st = e.target.closest("[data-status]");
+  if (st) { state.dStatus = state.dStatus === st.dataset.status ? "all" : st.dataset.status; return renderDash(); }
+  const d = e.target.closest("[data-dept]");
+  if (d) { state.dDept = state.dDept === d.dataset.dept ? "" : d.dataset.dept; return renderDash(); }
+  const j = e.target.closest("tr[data-job]");
+  if (j) {
+    state.jobId = j.dataset.job; state.expandedId = null;
+    try { localStorage.setItem("hr.job", state.jobId); } catch {}
+    setView("hire"); fillJobForm(currentJob()); renderAll(); window.scrollTo({ top: 0 });
+  }
+});
+$("dash").addEventListener("keydown", (e) => {
+  const el = e.target.closest("[data-dept], [data-status], tr[data-job]");
+  if (el && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); el.dispatchEvent(new MouseEvent("click", { bubbles: true })); }
+});
+$("dash").addEventListener("pointermove", (e) => {
+  const el = e.target.closest("[data-ti]");
+  el ? showTip(el, e.clientX, e.clientY) : hideTip();
+});
+$("dash").addEventListener("pointerleave", hideTip);
+$("dash").addEventListener("focusin", (e) => {
+  const el = e.target.closest("[data-ti]"); if (!el) return hideTip();
+  const b = el.getBoundingClientRect(); showTip(el, b.left + b.width / 2, b.top);
+});
+$("dash").addEventListener("focusout", hideTip);
+
+$("dExport").addEventListener("click", () => {
+  if (!window.XLSX) return toast("تعذّر تحميل مكتبة Excel. أعد تحميل الصفحة.");
+  const rows = dashData().filter((r) => (!state.dDept || r.dept === state.dDept) && (state.dStatus === "all" || (state.dStatus === "done") === r.done));
+  if (!rows.length) return toast("لا توجد وظائف لتصديرها.");
+  const wb = XLSX.utils.book_new();
+  const add = (data, name) => { const ws = XLSX.utils.json_to_sheet(data.length ? data : [{}]); ws["!cols"] = Object.keys(data[0] || {}).map(() => ({ wch: 18 })); XLSX.utils.book_append_sheet(wb, ws, name); };
+  add(groupDepts(rows).map((g) => ({ "القسم": g.dept, "عدد الوظائف": g.jobs, "المطلوب": g.needed, "تم تعيينهم": g.hired, "المتبقي": g.remaining,
+    "نسبة الاكتمال": g.needed ? +(g.filled / g.needed * 100).toFixed(0) + "%" : "100%", "الحالة": g.remaining ? "غير مكتمل" : "مكتمل" })), "الأقسام");
+  add(rows.map((r) => ({ "الوظيفة": r.j.title, "القسم": r.dept, "المطلوب": r.needed, "تم تعيينهم": r.hired, "المتبقي": r.remaining,
+    "جاهز للتعيين": r.ready, "عدد المرشحين": r.total, "الحالة": r.done ? "مكتمل" : "غير مكتمل" })), "الوظائف");
+  add(rows.flatMap((r) => r.emps.map((e) => ({ "الموظف": e.c.name, "التواصل": e.c.contact || "", "الوظيفة": r.j.title, "القسم": r.dept,
+    "درجة القبول": e.res?.score ?? "", "تاريخ التعيين": e.c.hiredAt ? new Date(e.c.hiredAt).toLocaleDateString("en-CA") : "" }))), "الموظفون");
+  saveFile("لوحة المعلومات - الأقسام والموظفين.xlsx", wb);
+});
+
+// ---------- boot ----------
+function goLocal(reason) {
+  state.local = true;
+  const saved = loadLocal();
+  if (saved) { state.jobs = saved.jobs; state.candidates = saved.candidates || []; }
+  else { state.jobs = [{ id: "local-job", ...Fuzzy.DEFAULT_JOB, department: "تقنية المعلومات", headcount: 1, createdAt: 0, placeholder: true }]; state.candidates = []; }
+  if (!state.jobs.some((j) => j.id === state.jobId)) state.jobId = state.jobs[0]?.id || null;
+  $("modeBanner").hidden = !!sheet.url(); // مع الشيت: البيانات محفوظة فيه، فلا داعي للتنبيه
+  $("modeBanner").textContent = reason + " المرشحون يُحفظون في هذا المتصفح، واربط Google Sheet من الإعدادات للاحتفاظ بنسخة.";
+  renderAll();
+  sheet.start();
+}
+
+// ---------- accounts UI ----------
+function applyRole() {
+  const s = auth.session, on = !!sheet.url() && !!s;
+  $("loginView").hidden = true; $("appRoot").hidden = false;
+  $("userBar").hidden = !on;
+  if (on) { $("uName").textContent = s.user.name || s.user.username; $("uRole").textContent = ROLE_AR[s.user.role] || ""; }
+  state.readOnly = !canEdit();
+  $("viewSeg").hidden = !canEdit(); // المشاهد يرى لوحة المعلومات فقط
+  $("viewSeg").querySelector('[data-v="users"]').hidden = !(isAdmin() && sheet.url());
+  $("sheetBox").hidden = !isAdmin();
+  applyReadOnly(); renderList();
+  setView(state.view);
+}
+
+let loginSetup = false;
+const setLoginErr = (m) => { $("lErr").textContent = m || ""; $("lErr").hidden = !m; };
+async function showLogin(msg = "") {
+  $("appRoot").hidden = true; $("loginView").hidden = false;
+  if (!$("pwDialog").hidden && $("pwDialog").open) $("pwDialog").close();
+  $("lSheetUrl").value = sheet.url();
+  setLoginErr(msg);
+  $("lSubmit").disabled = true; $("loginHint").textContent = "جارٍ الاتصال بـ Google Sheet…";
+  try {
+    const url = sheet.url();
+    const d = await (await fetch(url + (url.includes("?") ? "&" : "?") + "action=status")).json();
+    if (!d?.ok) throw new Error("bad");
+    loginSetup = !d.hasUsers;
+  } catch {
+    loginSetup = false;
+    setLoginErr("تعذّر الاتصال بـ Google Sheet. تأكد أن الكود الجديد منشور بإصدار جديد، أو صحّح الرابط بالأسفل.");
+    $("lSheet").open = true;
+  }
+  $("lNameWrap").hidden = $("lPass2Wrap").hidden = !loginSetup;
+  $("lName").required = $("lPass2").required = loginSetup;
+  $("lPass").autocomplete = loginSetup ? "new-password" : "current-password";
+  $("loginHint").textContent = loginSetup ? "لا توجد حسابات بعد. أنشئ حساب المدير، وبعدها تضيف المستخدمين من صفحة «المستخدمون»." : "سجّل الدخول للمتابعة";
+  $("lSubmit").textContent = loginSetup ? "إنشاء حساب المدير" : "دخول";
+  $("lSubmit").disabled = false;
+  $(loginSetup ? "lName" : "lUser").focus();
+}
+$("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault(); setLoginErr("");
+  const username = $("lUser").value.trim(), password = $("lPass").value;
+  if (loginSetup && password.length < 8) return setLoginErr("كلمة المرور 8 أحرف على الأقل.");
+  if (loginSetup && password !== $("lPass2").value) return setLoginErr("كلمتا المرور غير متطابقتين.");
+  $("lSubmit").disabled = true;
+  try {
+    const d = await api(loginSetup ? { action: "setup", name: $("lName").value.trim(), username, password } : { action: "login", username, password });
+    // مستخدم أو شيت مختلف عن آخر دخول في هذا المتصفح: لا نُبقي بيانات الشخص السابق
+    const who = sheet.url() + "|" + d.user.username;
+    if (localStorage.getItem("hr.lastUser") !== who) clearLocalData();
+    try { localStorage.setItem("hr.lastUser", who); } catch {}
+    auth.save({ token: d.token, user: d.user });
+    location.reload();
+  } catch (x) { setLoginErr(x.message); $("lSubmit").disabled = false; }
+});
+$("lSheetSave").addEventListener("click", () => {
+  const url = $("lSheetUrl").value.trim();
+  if (!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)) return setLoginErr("الرابط يجب أن يبدأ بـ https://script.google.com/");
+  try { localStorage.setItem("hr.sheetUrl", url); } catch {}
+  showLogin();
+});
+$("logoutBtn").addEventListener("click", async () => {
+  $("logoutBtn").disabled = true;
+  for (let i = 0; i < 25 && sheet.pending; i++) await new Promise((r) => setTimeout(r, 200)); // ننتظر آخر حفظ
+  try { await api({ action: "logout" }); } catch {}
+  auth.save(null); clearLocalData(); location.reload();
+});
+
+$("pwBtn").addEventListener("click", () => { $("pwForm").reset(); $("pwErr").hidden = true; $("pwDialog").showModal(); });
+$("pwCancel").addEventListener("click", () => $("pwDialog").close());
+$("pwForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const err = $("pwErr"); err.hidden = true;
+  if ($("pwNew").value !== $("pwNew2").value) { err.textContent = "كلمتا المرور غير متطابقتين."; err.hidden = false; return; }
+  $("pwSave").disabled = true;
+  try { await api({ action: "password", old: $("pwOld").value, password: $("pwNew").value }); $("pwDialog").close(); toast("تم تغيير كلمة المرور"); }
+  catch (x) { err.textContent = x.message; err.hidden = false; }
+  finally { $("pwSave").disabled = false; }
+});
+
+// ---------- users page (admin) ----------
+let usersList = [];
+async function loadUsers() {
+  if (!isAdmin() || !sheet.url()) return;
+  if (!usersList.length) $("uRows").innerHTML = `<tr><td colspan="6" class="empty">جارٍ التحميل…</td></tr>`;
+  try { usersList = (await api({ action: "users" })).users || []; renderUsers(); }
+  catch (x) { if (!x.auth) $("uRows").innerHTML = `<tr><td colspan="6" class="empty err">${esc(x.message)}</td></tr>`; }
+}
+function renderUsers() {
+  const meName = auth.session?.user?.username;
+  $("uRows").innerHTML = usersList.length ? usersList.map((u) => {
+    const me = u.username === meName;
+    const opts = Object.entries(ROLE_AR).map(([k, l]) => `<option value="${k}" ${u.role === k ? "selected" : ""}>${l}</option>`).join("");
+    return `<tr data-u="${esc(u.username)}">
+      <td class="name"><b>${esc(u.name)}</b>${me ? `<small>(أنت)</small>` : ""}</td>
+      <td dir="ltr">${esc(u.username)}</td>
+      <td><select data-role aria-label="صلاحية ${esc(u.name)}" ${me ? "disabled" : ""} style="width:auto">${opts}</select></td>
+      <td>${u.active ? `<span class="pill done">مفعّل</span>` : `<span class="pill reject">موقوف</span>`}</td>
+      <td class="num">${u.last_login ? new Date(u.last_login).toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" }) : "–"}</td>
+      <td class="ucell">${me ? "" : `<div class="inline">
+        <button class="btn" type="button" data-act="pw">تغيير كلمة المرور</button>
+        <button class="btn" type="button" data-act="toggle">${u.active ? "إيقاف" : "تفعيل"}</button>
+        <button class="btn danger" type="button" data-act="del">حذف</button></div>`}</td></tr>`;
+  }).join("") : `<tr><td colspan="6" class="empty">لا توجد حسابات.</td></tr>`;
+}
+async function userAction(fn, okMsg) {
+  try { await fn(); if (okMsg) toast(okMsg); } catch (x) { if (!x.auth) toast(x.message); }
+  loadUsers();
+}
+$("uRows").addEventListener("change", (e) => {
+  const sel = e.target.closest("select[data-role]"); if (!sel) return;
+  const username = sel.closest("tr").dataset.u;
+  userAction(() => api({ action: "user_save", user: { username, role: sel.value } }), `الصلاحية الآن: ${ROLE_AR[sel.value]}`);
+});
+$("uRows").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const tr = b.closest("tr"), username = tr.dataset.u, cell = tr.querySelector(".ucell");
+  const u = usersList.find((x) => x.username === username); if (!u) return;
+  const act = b.dataset.act;
+  if (act === "pw") {
+    cell.innerHTML = `<div class="inline"><input type="text" dir="ltr" placeholder="كلمة مرور جديدة (8+)" aria-label="كلمة المرور الجديدة" autocomplete="off">
+      <button class="btn primary" type="button" data-act="pwsave">حفظ</button><button class="btn" type="button" data-act="cancel">تراجع</button></div>`;
+    return cell.querySelector("input").focus();
+  }
+  if (act === "pwsave") {
+    const pw = cell.querySelector("input").value;
+    if (pw.length < 8) return toast("كلمة المرور 8 أحرف على الأقل.");
+    return userAction(() => api({ action: "user_save", user: { username, password: pw } }), `تم تغيير كلمة مرور ${u.name}`);
+  }
+  if (act === "toggle") return userAction(() => api({ action: "user_save", user: { username, active: !u.active } }), u.active ? `تم إيقاف ${u.name}` : `تم تفعيل ${u.name}`);
+  if (act === "del") {
+    cell.innerHTML = `<div class="inline"><span>حذف ${esc(u.name)} نهائياً؟</span>
+      <button class="btn danger" type="button" data-act="delok">نعم، احذف</button><button class="btn" type="button" data-act="cancel">تراجع</button></div>`;
+    return;
+  }
+  if (act === "delok") return userAction(() => api({ action: "user_delete", username }), `تم حذف ${u.name}`);
+  if (act === "cancel") renderUsers();
+});
+$("uGen").addEventListener("click", () => {
+  const abc = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+  const r = crypto.getRandomValues(new Uint32Array(10));
+  $("uNewPass").value = [...r].map((x) => abc[x % abc.length]).join("");
+});
+$("uForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const err = $("uErr"); err.hidden = true;
+  const user = { name: $("uNewName").value.trim(), username: $("uNewUser").value.trim(), password: $("uNewPass").value, role: $("uNewRole").value };
+  if (user.password.length < 8) { err.textContent = "كلمة المرور 8 أحرف على الأقل."; err.hidden = false; return; }
+  $("uAdd").disabled = true;
+  try {
+    await api({ action: "user_save", create: true, user });
+    toast(`تم إنشاء حساب ${user.name} (${ROLE_AR[user.role]})`);
+    $("uForm").reset(); loadUsers();
+  } catch (x) { if (!x.auth) { err.textContent = x.message; err.hidden = false; } }
+  finally { $("uAdd").disabled = false; }
+});
+$("uReload").addEventListener("click", loadUsers);
+async function showCsv(reset) {
+  try {
+    const { key } = await api({ action: "csv_key", reset: !!reset });
+    const url = sheet.url();
+    $("uCsv").value = url + (url.includes("?") ? "&" : "?") + "action=csv&key=" + key;
+    $("uCsv").select();
+    if (reset) toast("تم إنشاء رابط جديد، والرابط القديم توقف.");
+  } catch (x) { if (!x.auth) toast(x.message); }
+}
+$("uCsvShow").addEventListener("click", () => showCsv(false));
+$("uCsvReset").addEventListener("click", () => showCsv(true));
+
+renderAll();
+async function bootData() {
+  const claude = window.claude;
+  if (!claude?.use) return goLocal("نسخة مستقلة.");
+  claude.use("downloads").then((d) => (state.downloads = d)).catch(() => {});
+  const [db, user] = await Promise.all([claude.use("db").catch(() => null), claude.use("user").catch(() => null)]);
+  if (!db) return goLocal("الحفظ المشترك غير متاح (سجّل الدخول أو اطلب صلاحية المساهمة).");
+  // زوار الرابط العام لا يملكون صلاحية الكتابة في البيانات المشتركة: يعمل التطبيق لهم بالكامل في جلستهم فقط
+  let canWrite = null;
+  try { canWrite = await user?.can?.("data.write"); } catch {}
+  if (canWrite === false) return goLocal("أنت تستخدم التطبيق كزائر: التقييم والترتيب والتصدير تعمل بالكامل.");
+  state.db = db;
+  db.collection("jobs").onSnapshot((snap) => {
+    state.jobs = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    renderAll();
+  }, () => toast("انقطع الاتصال بقاعدة البيانات. أعد تحميل الصفحة."));
+  db.collection("candidates").onSnapshot((snap) => {
+    state.candidates = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderList();
+    sheet.start();
+  }, () => toast("انقطع الاتصال بقاعدة البيانات. أعد تحميل الصفحة."));
+}
+
+// مع رابط شيت: لا يظهر التطبيق إلا بعد تسجيل الدخول
+if (!sheet.url()) { applyRole(); bootData(); }
+else if (!auth.session) showLogin();
+else {
+  applyRole(); bootData();
+  api({ action: "me" }).then((d) => { auth.save({ ...auth.session, user: d.user }); applyRole(); }).catch(() => {});
+}
+</script>
+
+</body>
+</html>
